@@ -1,0 +1,29 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="/testem/mocha.css">
+    <script src="/testem/mocha.js"></script>
+    <script src="/testem.js"></script>
+    <script src="/spec/vendor/chai.js"></script>
+    <script src="/spec/vendor/sinon.js"></script>
+    <script src="/spec/vendor/sinon-chai.js"></script>
+    <script>
+      mocha.setup('bdd');
+      mocha.setup({ignoreLeaks: true});
+      window.expect = chai.expect;
+    </script>
+
+    <!-- Scripts -->
+    <script src="/lib/<%= project_name %>.js"></script>
+
+    <!-- Specs -->
+    <script src="/.tmp/spec_helper.js"></script>
+    <script src="/.tmp/<%= project_name %>.spec.js"></script>
+
+  </head>
+  <body>
+    <div id='mocha'></div>
+    <script>
+      mocha.run();
+    </script>
+  </body>
+</html>

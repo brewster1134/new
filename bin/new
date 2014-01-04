@@ -3,4 +3,4 @@ $: << File.dirname(__FILE__) + '/../lib'
 
 require 'new'
 
-New.start $*
+New::Cli.start ARGV

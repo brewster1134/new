@@ -1,3 +1,11 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem 'rspec'
+gem 'thor'
+
+group :development do
+  gem 'guard'
+  gem 'guard-bundler'
+  gem 'guard-rspec'
+  gem 'rspec'
+  gem 'terminal-notifier-guard'
+end

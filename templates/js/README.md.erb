@@ -1,0 +1,86 @@
+# <%= project_name %>
+
+## Dependencies
+*
+
+_Optional_
+
+*
+
+## Usage
+
+#### Methods
+
+###### METHOD NAME
+_METHOD DESCRIPTION_
+> _Arguments_
+```yaml
+argument: Argument description # default:
+```
+
+---
+> _example_
+```coffee
+METHOD ARGUMENT
+```
+
+## Development
+
+### Dependencies
+* Ruby <%= ruby_version %>
+* Bundler Gem
+* Node.js
+* npm
+* Testem
+* PhantomJS
+
+_Optional_
+
+* Growl _\* for <= OS X Lion 10.7_
+
+##### Automated Installation _(Using [Yuyi](https://github.com/brewster1134/Yuyi))_
+
+_create a `menu.yml` in `~/Documents` with the following_
+```yaml
+ruby:
+  versions: ['<%= ruby_version %>']
+bundler:
+node:
+npm:
+testem:
+phantom_js:
+# growl:
+```
+_and then run_
+
+`ruby -e "$(curl -fsSL https://raw.github.com/brewster1134/Yuyi/master/bin/install)"`
+
+##### Manual Installation _\* may be incomplete_
+
+```shell
+ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+brew install rbenv
+brew install ruby-build
+brew install node
+brew install phantomjs
+rbenv install <%= ruby_version %>
+gem update --system
+gem install bundler
+bundle install
+npm install testem -g
+```
+
+### Compiling
+`bundle exec guard`
+
+Do **NOT** modify any `.js` files!  Modify the coffee files in the `src` directory.  Guard will watch for changes and compile them to the `lib` directory.
+
+### Testing
+Run `testem`
+
+_- or -_
+
+Run `testem -g` if running OS X Lion or below for Growl support
+
+## To-Do
+*

@@ -1,0 +1,12 @@
+test_page: spec/index.html
+src_files:
+  - .tmp/*.spec.js
+  - lib/*.js
+serve_files:
+  - spec/fixtures/*.html
+  - spec/vendor/*.js
+  - .tmp/*.spec.js
+launch_in_dev:
+  - phantomjs
+launch_in_ci:
+  - phantomjs
