@@ -1,20 +1,28 @@
 require 'yaml'
 
 class New::Template
-  TEMPLATES_DIR = File.expand_path('../../../templates', __FILE__)
+  CUSTOM_FOLDER = File.join(Dir.home, '.new')
+  CUSTOM_TEMPLATES = File.join(CUSTOM_FOLDER, 'templates')
+  CUSTOM_CONFIG_FILE = File.join(CUSTOM_FOLDER, '.new')
+  CUSTOM_CONFIG_TEMPLATE = {
+    'license' => '[LICENSE]',
+    'developer' => {
+      'name' => '[NAME]',
+      'email' => '[EMAIL]',
+    }
+  }
 
-  attr_accessor :options, :project_dir, :template, :template_dir
+  attr_accessor :options, :project_dir, :template, :custom
 
   # Create all variables and run new project creation methods
   #
   def initialize template, options
     @template = template
     @options = options
-    @template_dir = File.join(TEMPLATES_DIR, template.to_s) # the template directory to copy
-    @project_dir = File.join(Dir.pwd, options[:name])       # the newly created project directory
+    @project_dir = File.join(Dir.pwd, options[:name]) # the newly created project directory
 
     copy_dir
-    create_new_config
+    create_project_config
     process_erb_files
   end
 
@@ -23,19 +31,51 @@ class New::Template
   # Create the new project by copying the template directory
   #
   def copy_dir
-    FileUtils.cp_r template_dir, project_dir
+    FileUtils.cp_r get_template_dir, project_dir
+  end
+
+  # Get the template directory to copy from
+  #
+  def get_template_dir
+    if Dir.exists? File.join(CUSTOM_TEMPLATES, template.to_s)
+      @custom = true
+      File.join(CUSTOM_TEMPLATES, template.to_s)
+    else
+      File.join(New::TEMPLATES_DIR, template.to_s)
+    end
   end
 
   # Create the .new configuration file in the new project
   #
-  def create_new_config
-    new_config = File.join(project_dir, '.new')
+  def create_project_config
+    config_hash = {
+      'template' => template,
+      'project_name' => options[:name],
+    }.merge get_config_file
 
+    new_config = File.join(project_dir, '.new')
     File.open new_config, 'w' do |f|
-      f.write({
-        'template' => template
-      }.to_yaml)
+      f.write(config_hash.to_yaml)
     end
+  end
+
+  # Get a custom config in the home dir, or use the default with placeholders
+  #
+  def get_config_file
+    config = if File.exists? CUSTOM_CONFIG_FILE
+      YAML.load(File.open(CUSTOM_CONFIG_FILE))
+    else
+      CUSTOM_CONFIG_TEMPLATE
+    end
+
+    # Add a custom: true to config if a custom template is found
+    if @custom
+      config = config.merge({
+        'custom' => true
+      })
+    end
+
+    config
   end
 
   def process_erb_files

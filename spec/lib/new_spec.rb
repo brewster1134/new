@@ -6,6 +6,6 @@ describe New do
   end
 
   it 'should return an array of available templates' do
-    expect(New::templates).to match_array [:js]
+    expect(New.templates).to match_array [:js]
   end
 end

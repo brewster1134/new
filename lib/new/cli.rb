@@ -24,6 +24,28 @@ class New::Cli < Thor
     end
   end
 
+  desc 'init', 'Set up your home directory folder for storing custom templates and default configuration'
+  def init
+    # create folder
+    if Dir.exists? New::Template::CUSTOM_FOLDER
+      New.say 'Home folder already exists.', type: :warn
+    else
+      New.say 'Creating home folder.', type: :success
+      FileUtils.mkdir_p New::Template::CUSTOM_TEMPLATES
+    end
+
+    # create config file
+    if File.exists? New::Template::CUSTOM_CONFIG_FILE
+      New.say 'Default config file already exists.', type: :warn
+    else
+      New.say 'Creaeting default configuration file.', type: :success
+      File.open New::Template::CUSTOM_CONFIG_FILE, 'w' do |f|
+        f.write New::Template::CUSTOM_CONFIG_TEMPLATE.to_yaml
+      end
+      New.say "Edit #{New::Template::CUSTOM_CONFIG_FILE} with your custom configuration details.", type: :warn
+    end
+  end
+
   private
 
   def template template

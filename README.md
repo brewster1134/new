@@ -1,9 +1,10 @@
-# nu
+# new
 Opinionated Project Creation
 
 ##### Usage
 ```shell
 gem install new
+new init
 new [TEMPLATE] --name [NAME]
 ```
 
@@ -13,6 +14,10 @@ new [TEMPLATE] --name [NAME]
 * `rails`
 * `ruby`
 * ?
+
+##### TODO
+* common rake tasks (eg push to github)
+* rake tasks per template type (eg gem: publish to rubygems)
 
 ##### Contributing
 1. Fork it ( http://github.com/<my-github-username>/./fork )
