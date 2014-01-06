@@ -3,6 +3,7 @@ require 'recursive-open-struct'
 require 'yaml'
 
 class New::Template
+  FILENAME_RENAME_MATCH = /\[([A-Z_.]+)\]/
   CUSTOM_FOLDER = File.join(Dir.home, '.new')
   CUSTOM_TEMPLATES = File.join(CUSTOM_FOLDER, 'templates')
   CUSTOM_CONFIG_FILE = File.join(CUSTOM_FOLDER, '.new')
@@ -27,6 +28,7 @@ class New::Template
     set_options template, name
     copy_dir
     create_config_file
+    rename_paths
     process_erb_files
   end
 
@@ -50,6 +52,9 @@ private
         custom: true
       })
     end
+
+    # Convert options to OpenStruct so we can use dot notation in the templates
+    @template_options = RecursiveOpenStruct.new(config)
 
     @options = config
   end
@@ -80,12 +85,46 @@ private
     end
   end
 
+  # Collect ERB files to process
+  #
   def process_erb_files
-    # Convert options to OpenStruct so we can use dot notation in the templates
-    @template_options = RecursiveOpenStruct.new(@options)
-
     Dir.glob(File.join(@project_dir, '**/*.erb')).each do |file|
       process_erb_file file
+    end
+  end
+
+  # Collect files with a matching value to interpolate
+  #
+  def rename_paths
+    get_path = -> type do
+      Dir.glob(File.join(@project_dir, '**/*')).select do |e|
+        File.send("#{type}?".to_sym, e) && e =~ FILENAME_RENAME_MATCH
+      end
+    end
+
+    # rename directories first
+    get_path[:directory].each{ |dir| rename_path dir }
+    get_path[:file].each{ |dir| rename_path dir }
+  end
+
+  # Interpolate filenames with template options
+  #
+  def rename_path path
+    new_path = path.gsub FILENAME_RENAME_MATCH do
+      # Extract interpolated values into symbols
+      methods = $1.downcase.split('.').map(&:to_sym)
+
+      # Call each method on options
+      methods.inject(@template_options){ |options, method| options.send(method) }
+    end
+
+
+    if File.file?(path)
+      # puts path
+      # puts new_path
+      File.rename path, new_path
+    else
+      FileUtils.mv path, new_path
     end
   end
 
@@ -103,6 +142,7 @@ private
   end
 
   # Allow templates to call option values directly
+  #
   def method_missing method
     @template_options.send(method.to_sym) || super
   end

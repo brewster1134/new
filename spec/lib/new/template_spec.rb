@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe New::Template do
-  let(:template) { New::Template.new(:foo, 'new_foo') }
+  let(:project_name) { 'new_foo' }
+  let(:template) { New::Template.new(:foo, project_name) }
   let(:options) { template.template_options }
   let(:project_config) { YAML.load(File.open(root('.tmp', options.project_name, '.new'))).deep_symbolize_keys! }
 
@@ -15,7 +16,7 @@ describe New::Template do
   end
 
   after do
-    FileUtils.rm_rf root('.tmp', 'new_foo')
+    FileUtils.rm_rf root('.tmp', project_name)
   end
 
   describe 'new project structure' do
@@ -41,7 +42,7 @@ describe New::Template do
 
     it 'should add all the neccessary yaml info' do
       expect(project_config[:type]).to eq :foo
-      expect(project_config[:project_name]).to eq 'new_foo'
+      expect(project_config[:project_name]).to eq project_name
       expect(project_config[:developer][:name]).to eq 'Foo Bar'
       expect(project_config[:developer][:email]).to eq 'foo@bar.com'
       expect(project_config[:license]).to eq 'MIT'
@@ -49,12 +50,12 @@ describe New::Template do
 
     it 'should process and rename .erb files' do
       # check that files exist
-      expect(File.exists?(root('.tmp', options.project_name, 'foo.txt'))).to eq true
-      expect(File.exists?(root('.tmp', options.project_name, 'nested', 'foo.txt'))).to eq true
+      expect(File.exists?(root('.tmp', options.project_name, 'Foo Bar.txt'))).to eq true
+      expect(File.exists?(root('.tmp', options.project_name, 'nested_foo', 'foo.txt'))).to eq true
 
       # check their content has been processed
-      expect(File.open(root('.tmp', options.project_name, 'foo.txt')).read).to include 'template = foo'
-      expect(File.open(root('.tmp', options.project_name, 'nested', 'foo.txt')).read).to include 'foo bar'
+      expect(File.open(root('.tmp', options.project_name, 'Foo Bar.txt')).read).to include 'template foo'
+      expect(File.open(root('.tmp', options.project_name, 'nested_foo', 'foo.txt')).read).to include 'foo bar'
     end
 
     context 'when a custom template is defined' do
