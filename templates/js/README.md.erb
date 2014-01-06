@@ -27,7 +27,7 @@ METHOD ARGUMENT
 ## Development
 
 ### Dependencies
-* Ruby <%= ruby_version %>
+* Ruby <%= RUBY_VERSION %>
 * Bundler Gem
 * Node.js
 * npm
@@ -43,7 +43,7 @@ _Optional_
 _create a `menu.yml` in `~/Documents` with the following_
 ```yaml
 ruby:
-  versions: ['<%= ruby_version %>']
+  versions: ['<%= RUBY_VERSION %>']
 bundler:
 node:
 npm:
@@ -63,7 +63,7 @@ brew install rbenv
 brew install ruby-build
 brew install node
 brew install phantomjs
-rbenv install <%= ruby_version %>
+rbenv install <%= RUBY_VERSION %>
 gem update --system
 gem install bundler
 bundle install
@@ -84,3 +84,10 @@ Run `testem -g` if running OS X Lion or below for Growl support
 
 ## To-Do
 *
+
+## Contributing
+1. Fork it ( http://github.com/<%= github.username %>/<%= project_name %>/fork )
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request

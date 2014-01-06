@@ -1,3 +1,5 @@
 .bundle
+.new
 .tmp
+tmp
 *.gem

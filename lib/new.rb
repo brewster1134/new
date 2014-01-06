@@ -12,6 +12,7 @@ end
 
 require 'new/cli'
 require 'new/dsl'
+require 'new/objects'
 require 'new/template'
 
 class New

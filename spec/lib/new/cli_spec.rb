@@ -13,7 +13,11 @@ describe New::Cli do
     end
 
     it 'should accept template name as argument' do
-      expect { subject.foo '--name', 'party' }.to_not raise_error
+      expect { subject.foo 'party' }.to_not raise_error
+    end
+
+    it 'should raise an error if no name is given' do
+      expect { subject.foo }.to raise_error
     end
 
     it 'should raise an error for non-template argument' do
