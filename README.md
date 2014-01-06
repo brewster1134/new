@@ -5,7 +5,7 @@ Opinionated Project Creation
 ```shell
 gem install new
 new init
-new [TEMPLATE] --name [NAME]
+new [TEMPLATE] [NAME]
 ```
 
 ##### Templates
@@ -16,6 +16,7 @@ new [TEMPLATE] --name [NAME]
 * ?
 
 ##### TODO
+* interpolate file names
 * common rake tasks (eg push to github)
 * rake tasks per template type (eg gem: publish to rubygems)
 

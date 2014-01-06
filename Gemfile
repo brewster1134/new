@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'recursive-open-struct'
 gem 'thor'
 
 group :development do
