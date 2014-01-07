@@ -88,7 +88,7 @@ private
   # Collect ERB files to process
   #
   def process_erb_files
-    Dir.glob(File.join(@project_dir, '**/*.erb')).each do |file|
+    Dir.glob(File.join(@project_dir, '**/*.erb'), File::FNM_DOTMATCH).each do |file|
       process_erb_file file
     end
   end

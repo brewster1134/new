@@ -38,38 +38,6 @@ _Optional_
 
 * Growl _\* for <= OS X Lion 10.7_
 
-##### Automated Installation _(Using [Yuyi](https://github.com/brewster1134/Yuyi))_
-
-_create a `menu.yml` in `~/Documents` with the following_
-```yaml
-ruby:
-  versions: ['<%= RUBY_VERSION %>']
-bundler:
-node:
-npm:
-testem:
-phantom_js:
-# growl:
-```
-_and then run_
-
-`ruby -e "$(curl -fsSL https://raw.github.com/brewster1134/Yuyi/master/bin/install)"`
-
-##### Manual Installation _\* may be incomplete_
-
-```shell
-ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
-brew install rbenv
-brew install ruby-build
-brew install node
-brew install phantomjs
-rbenv install <%= RUBY_VERSION %>
-gem update --system
-gem install bundler
-bundle install
-npm install testem -g
-```
-
 ### Compiling
 `bundle exec guard`
 
