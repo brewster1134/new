@@ -50,6 +50,12 @@ class New::Cli < Thor
     end
   end
 
+  desc 'release', 'Release your new code (Run from within a project directory!)'
+  def release
+    dir = Dir.pwd
+    raise unless File.exists? File.join(dir, '.new')
+  end
+
 private
 
   def template template, name

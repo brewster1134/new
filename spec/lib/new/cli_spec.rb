@@ -49,4 +49,27 @@ describe New::Cli do
       expect(Dir.exists?(root('.tmp', '.new', 'templates')))
     end
   end
+
+  describe '#release' do
+    context 'for an invalid project' do
+      before do
+        Dir.chdir root('.tmp')
+        File.delete '.new' rescue nil
+      end
+
+      it 'should raise an error if no config file is found' do
+        expect { subject.release }.to raise_error
+      end
+    end
+
+    context 'for a valid project' do
+      before do
+        Dir.chdir root('spec', 'fixtures', 'project')
+        subject.release
+      end
+
+      it 'should run the project task methods' do
+      end
+    end
+  end
 end

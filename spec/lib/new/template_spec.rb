@@ -46,6 +46,7 @@ describe New::Template do
       expect(project_config[:developer][:name]).to eq 'Foo Bar'
       expect(project_config[:developer][:email]).to eq 'foo@bar.com'
       expect(project_config[:license]).to eq 'MIT'
+      expect(project_config[:tasks]).to eq [:foo, :bar] # from template specific config file
     end
 
     it 'should process and rename .erb files' do

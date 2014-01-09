@@ -2,6 +2,8 @@ require 'erb'
 require 'recursive-open-struct'
 require 'yaml'
 
+# Class to process a template to create a new project
+#
 class New::Template
   FILENAME_RENAME_MATCH = /\[([A-Z_.]+)\]/
   CUSTOM_FOLDER = File.join(Dir.home, '.new')
@@ -23,7 +25,7 @@ class New::Template
   # Create all variables and run new project creation methods
   #
   def initialize template, name
-    @project_dir = File.join(Dir.pwd, name) # the newly created project directory
+    @options = {}
 
     set_options template, name
     copy_dir
@@ -37,41 +39,39 @@ private
   # Create the options object
   #
   def set_options template, name
+    @project_dir = File.join(Dir.pwd, name)   # the newly created project directory
+    @template_dir = get_template_dir template # the template directory to copy
+
     # Check for custom config file
     custom_config_file = YAML.load(File.open(CUSTOM_CONFIG_FILE)).deep_symbolize_keys! rescue {}
+    template_config_file = YAML.load(File.open(File.join(@template_dir, '.new'))).deep_symbolize_keys! rescue {}
 
     # merge options together
-    config = CUSTOM_CONFIG_TEMPLATE.clone.merge!(custom_config_file).merge!({
+    config = CUSTOM_CONFIG_TEMPLATE.clone.merge!(custom_config_file).merge!(template_config_file).merge!({
       type: template,
       project_name: name
     })
 
-    # Add a custom: true to config if a custom template is found
-    if Dir.exists? File.join(CUSTOM_TEMPLATES, template.to_s)
-      config.merge!({
-        custom: true
-      })
-    end
+    @options.merge! config
 
     # Convert options to OpenStruct so we can use dot notation in the templates
-    @template_options = RecursiveOpenStruct.new(config)
-
-    @options = config
+    @template_options = RecursiveOpenStruct.new(@options)
   end
 
   # Create the new project by copying the template directory
   #
   def copy_dir
-    FileUtils.cp_r get_template_dir, @project_dir
+    FileUtils.cp_r @template_dir, @project_dir
   end
 
   # Get the template directory to copy from
   #
-  def get_template_dir
-    if @options[:custom]
-      File.join(CUSTOM_TEMPLATES, @options[:type].to_s)
+  def get_template_dir template
+    if Dir.exists? File.join(CUSTOM_TEMPLATES, template.to_s)
+      @options[:custom] = true
+      File.join(CUSTOM_TEMPLATES, template.to_s)
     else
-      File.join(New::TEMPLATES_DIR, @options[:type].to_s)
+      File.join(New::TEMPLATES_DIR, template.to_s)
     end
   end
 
