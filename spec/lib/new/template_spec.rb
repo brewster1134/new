@@ -2,17 +2,17 @@ require 'spec_helper'
 
 describe New::Template do
   let(:project_name) { 'new_foo' }
-  let(:template) { New::Template.new(:foo, project_name) }
-  let(:options) { template.template_options }
-  let(:project_config) { YAML.load(File.open(root('.tmp', options.project_name, '.new'))).deep_symbolize_keys! }
+  let(:template) { New::Template.new(:foo_template, project_name) }
+  let(:options) { template.instance_variable_get '@template_options' }
+  let(:project_config) { YAML.load(File.open(root('.tmp', options.project_name, New::CONFIG_FILE))).deep_symbolize_keys! }
 
   before :all do
     Dir.chdir root('.tmp')
   end
 
   before do
-    stub_const 'New::TEMPLATES_DIR', root('spec', 'fixtures', 'templates')
-    stub_const 'New::Template::CUSTOM_CONFIG_FILE', root('spec', 'fixtures', 'new_default')
+    stub_const 'New::DEFAULT_DIR', root('spec', 'fixtures')
+    stub_const 'New::CUSTOM_DIR', root('spec', 'fixtures', 'custom')
   end
 
   after do
@@ -25,7 +25,7 @@ describe New::Template do
     end
 
     it 'should set the template' do
-      expect(options.type).to eq :foo
+      expect(options.type).to eq :foo_template
     end
 
     it 'should not add the custom value' do
@@ -37,39 +37,37 @@ describe New::Template do
     end
 
     it 'should create a `.new` config file' do
-      expect(File.exists?(root('.tmp', options.project_name, '.new'))).to eq true
+      expect(File.exists?(root('.tmp', options.project_name, New::CONFIG_FILE))).to eq true
     end
 
     it 'should add all the neccessary yaml info' do
-      expect(project_config[:type]).to eq :foo
+      expect(project_config[:type]).to eq :foo_template
       expect(project_config[:project_name]).to eq project_name
       expect(project_config[:developer][:name]).to eq 'Foo Bar'
       expect(project_config[:developer][:email]).to eq 'foo@bar.com'
       expect(project_config[:license]).to eq 'MIT'
-      expect(project_config[:tasks]).to eq [:foo, :bar] # from template specific config file
+      expect(project_config[:tasks]).to eq [:foo] # from template specific config file
     end
 
     it 'should process and rename .erb files' do
       # check that files exist
       expect(File.exists?(root('.tmp', options.project_name, 'Foo Bar.txt'))).to eq true
-      expect(File.exists?(root('.tmp', options.project_name, 'nested_foo', 'foo.txt'))).to eq true
+      expect(File.exists?(root('.tmp', options.project_name, 'nested_foo_template', 'foo.txt'))).to eq true
 
       # check their content has been processed
       expect(File.open(root('.tmp', options.project_name, 'Foo Bar.txt')).read).to include 'template foo'
-      expect(File.open(root('.tmp', options.project_name, 'nested_foo', 'foo.txt')).read).to include 'foo bar'
+      expect(File.open(root('.tmp', options.project_name, 'nested_foo_template', 'foo.txt')).read).to include 'foo bar'
     end
 
     context 'when a custom template is defined' do
-      before do
-        stub_const 'New::Template::CUSTOM_TEMPLATES', root('spec', 'fixtures', 'custom_templates')
-      end
+      let(:template) { New::Template.new(:custom_bar_template, project_name) }
 
       it 'should add the custom value' do
         expect(project_config[:custom]).to eq true
       end
 
       it 'should use files from the custom template' do
-        expect(File.exists?(root('.tmp', options.project_name, 'custom_foo.txt'))).to eq true
+        expect(File.exists?(root('.tmp', options.project_name, 'custom_bar.txt'))).to eq true
       end
     end
   end

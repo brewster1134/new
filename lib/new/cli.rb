@@ -1,4 +1,5 @@
 require 'thor'
+require 'yaml'
 
 class New::Cli < Thor
   desc '[TEMPLATE] [NAME]', "Create a new project with a given template (#{New.templates.join(' ')})"
@@ -30,30 +31,36 @@ class New::Cli < Thor
 
   desc 'init', 'Set up your home directory folder for storing custom templates and default configuration'
   def init
-    # create folder
-    if Dir.exists? New::Template::CUSTOM_FOLDER
+    if Dir.exists? New::CUSTOM_DIR
       New.say 'Home folder already exists.', type: :warn
     else
+      # create folder
       New.say 'Creating home folder.', type: :success
-      FileUtils.mkdir_p New::Template::CUSTOM_TEMPLATES
-    end
+      FileUtils.mkdir_p New::CUSTOM_DIR
+      FileUtils.mkdir_p File.join(New::CUSTOM_DIR, New::TASKS_DIR_NAME)
+      FileUtils.mkdir_p File.join(New::CUSTOM_DIR, New::TEMPLATES_DIR_NAME)
 
-    # create config file
-    if File.exists? New::Template::CUSTOM_CONFIG_FILE
-      New.say 'Default config file already exists.', type: :warn
-    else
-      New.say 'Creaeting default configuration file.', type: :success
-      File.open New::Template::CUSTOM_CONFIG_FILE, 'w' do |f|
+      # create config file
+      New.say 'Creating default configuration file.', type: :success
+      File.open File.join(New::CUSTOM_DIR, New::CONFIG_FILE), 'w' do |f|
         f.write New::Template::CUSTOM_CONFIG_TEMPLATE.to_yaml
       end
-      New.say "Edit #{New::Template::CUSTOM_CONFIG_FILE} with your custom configuration details.", type: :warn
+
+      New.say "Edit #{File.join(New::CUSTOM_DIR, New::CONFIG_FILE)} with your custom configuration details.", type: :warn
     end
   end
 
   desc 'release', 'Release your new code (Run from within a project directory!)'
   def release
-    dir = Dir.pwd
-    raise unless File.exists? File.join(dir, '.new')
+    project_config_file = File.join(Dir.pwd, '.new')
+    raise unless File.exists? project_config_file
+
+    project_config_object = YAML.load(File.open(project_config_file)).deep_symbolize_keys!
+    tasks = project_config_object[:tasks]
+
+    tasks.each do |task|
+      New::Task.new task, project_config_object
+    end
   end
 
 private

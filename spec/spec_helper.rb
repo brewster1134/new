@@ -11,6 +11,11 @@ RSpec.configure do |config|
   config.before do
     New.stub(:say)
   end
+
+  config.before :each do
+    # Force specs to always lookup new templates and tasks
+    New.instance_variables.each{ |v| New.instance_variable_set(v, nil) }
+  end
 end
 
 def root *paths

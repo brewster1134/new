@@ -40,6 +40,7 @@ _Notice that you can access nested values using the dot notation._
 ##### TODO
 * common rake tasks (eg push to github)
 * rake tasks per template type (eg gem: publish to rubygems)
+* custom rake tasks (from ~/.new/tasks)
 
 ##### Contributing
 1. Fork it ( http://github.com/brewster1134/new/fork )

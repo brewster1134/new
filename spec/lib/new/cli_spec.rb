@@ -27,9 +27,7 @@ describe New::Cli do
 
   describe '#init' do
     before do
-      stub_const 'New::Template::CUSTOM_FOLDER', root('.tmp', '.new')
-      stub_const 'New::Template::CUSTOM_TEMPLATES', root('.tmp', '.new', 'templates')
-      stub_const 'New::Template::CUSTOM_CONFIG_FILE', root('.tmp', '.new', '.new')
+      stub_const 'New::CUSTOM_DIR', root('.tmp', '.new')
       subject.init
     end
 
@@ -45,8 +43,9 @@ describe New::Cli do
       expect(File.exists?(root('.tmp', '.new', '.new')))
     end
 
-    it 'should create an empty templates dir' do
+    it 'should create an empty templates & tasks dir' do
       expect(Dir.exists?(root('.tmp', '.new', 'templates')))
+      expect(Dir.exists?(root('.tmp', '.new', 'tasks')))
     end
   end
 
@@ -65,10 +64,16 @@ describe New::Cli do
     context 'for a valid project' do
       before do
         Dir.chdir root('spec', 'fixtures', 'project')
+        New::Task.stub(:new)
         subject.release
       end
 
+      after do
+        New::Task.unstub(:new)
+      end
+
       it 'should run the project task methods' do
+        expect(New::Task).to have_received(:new).with(:foo_task, {:tasks=>[:foo_task]})
       end
     end
   end

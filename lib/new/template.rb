@@ -5,10 +5,8 @@ require 'yaml'
 # Class to process a template to create a new project
 #
 class New::Template
+  # regex to match capital underscored template options names ie [PROJECT_NAME]
   FILENAME_RENAME_MATCH = /\[([A-Z_.]+)\]/
-  CUSTOM_FOLDER = File.join(Dir.home, '.new')
-  CUSTOM_TEMPLATES = File.join(CUSTOM_FOLDER, 'templates')
-  CUSTOM_CONFIG_FILE = File.join(CUSTOM_FOLDER, '.new')
   CUSTOM_CONFIG_TEMPLATE = {
     license: '[LICENSE]',
     github: {
@@ -19,8 +17,6 @@ class New::Template
       email: '[EMAIL]'
     }
   }
-
-  attr_accessor :options, :project_dir, :template_options
 
   # Create all variables and run new project creation methods
   #
@@ -43,8 +39,8 @@ private
     @template_dir = get_template_dir template # the template directory to copy
 
     # Check for custom config file
-    custom_config_file = YAML.load(File.open(CUSTOM_CONFIG_FILE)).deep_symbolize_keys! rescue {}
-    template_config_file = YAML.load(File.open(File.join(@template_dir, '.new'))).deep_symbolize_keys! rescue {}
+    custom_config_file = YAML.load(File.open(File.join(New::CUSTOM_DIR, New::CONFIG_FILE))).deep_symbolize_keys! rescue {}
+    template_config_file = YAML.load(File.open(File.join(@template_dir, New::CONFIG_FILE))).deep_symbolize_keys! rescue {}
 
     # merge options together
     config = CUSTOM_CONFIG_TEMPLATE.clone.merge!(custom_config_file).merge!(template_config_file).merge!({
@@ -67,18 +63,18 @@ private
   # Get the template directory to copy from
   #
   def get_template_dir template
-    if Dir.exists? File.join(CUSTOM_TEMPLATES, template.to_s)
+    if New.custom_templates.include? template
       @options[:custom] = true
-      File.join(CUSTOM_TEMPLATES, template.to_s)
+      File.join(New::CUSTOM_DIR, New::TEMPLATES_DIR_NAME, template.to_s)
     else
-      File.join(New::TEMPLATES_DIR, template.to_s)
+      File.join(New::DEFAULT_DIR, New::TEMPLATES_DIR_NAME, template.to_s)
     end
   end
 
   # Create the .new configuration file in the new project
   #
   def create_config_file
-    new_config = File.join(@project_dir, '.new')
+    new_config = File.join(@project_dir, New::CONFIG_FILE)
     File.open new_config, 'w' do |f|
       yaml_options = Marshal.load(Marshal.dump(@options)).deep_stringify_keys!.to_yaml
       f.write(yaml_options)
@@ -118,10 +114,7 @@ private
       methods.inject(@template_options){ |options, method| options.send(method) }
     end
 
-
     if File.file?(path)
-      # puts path
-      # puts new_path
       File.rename path, new_path
     else
       FileUtils.mv path, new_path
