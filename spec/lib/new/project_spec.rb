@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe New::Template do
-  let(:project_name) { 'new_foo' }
-  let(:template) { New::Template.new(:foo_template, project_name) }
-  let(:options) { template.instance_variable_get '@template_options' }
+describe New::Project do
+  let(:project_name) { 'new_project' }
+  let(:project) { New::Project.new(:foo_template, project_name) }
+  let(:options) { project.instance_variable_get '@template_options' }
   let(:project_config) { YAML.load(File.open(root('.tmp', options.project_name, New::CONFIG_FILE))).deep_symbolize_keys! }
 
   before :all do
@@ -21,7 +21,7 @@ describe New::Template do
 
   describe 'new project structure' do
     it 'should access option values directly in dot notation' do
-      expect(template.developer.name).to_not be_nil
+      expect(project.developer.name).to_not be_nil
     end
 
     it 'should set the template' do
@@ -60,7 +60,7 @@ describe New::Template do
     end
 
     context 'when a custom template is defined' do
-      let(:template) { New::Template.new(:custom_bar_template, project_name) }
+      let(:project) { New::Project.new(:custom_bar_template, project_name) }
 
       it 'should add the custom value' do
         expect(project_config[:custom]).to eq true

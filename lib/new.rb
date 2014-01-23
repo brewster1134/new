@@ -49,8 +49,8 @@ end
 require 'new/cli'
 require 'new/dsl'
 require 'new/objects'
+require 'new/project'
 require 'new/task'
-require 'new/template'
 
 class New
   extend New::Dsl

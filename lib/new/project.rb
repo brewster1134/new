@@ -2,9 +2,7 @@ require 'erb'
 require 'recursive-open-struct'
 require 'yaml'
 
-# Class to process a template to create a new project
-#
-class New::Template
+class New::Project
   # regex to match capital underscored template options names ie [PROJECT_NAME]
   FILENAME_RENAME_MATCH = /\[([A-Z_.]+)\]/
   CUSTOM_CONFIG_TEMPLATE = {
@@ -24,7 +22,7 @@ class New::Template
     @options = {}
 
     set_options template, name
-    copy_dir
+    copy_template
     create_config_file
     rename_paths
     process_erb_files
@@ -56,7 +54,7 @@ private
 
   # Create the new project by copying the template directory
   #
-  def copy_dir
+  def copy_template
     FileUtils.cp_r @template_dir, @project_dir
   end
 
@@ -89,6 +87,19 @@ private
     end
   end
 
+  def process_erb_file file
+    # Process the erb file
+    processed_file = ERB.new(File.read(file)).result(binding)
+
+    # Overwrite the original file with the processed file
+    File.open file, 'w' do |f|
+      f.write processed_file
+    end
+
+    # Remove the .erb from the file name
+    File.rename file, file.chomp('.erb')
+  end
+
   # Collect files with a matching value to interpolate
   #
   def rename_paths
@@ -119,19 +130,6 @@ private
     else
       FileUtils.mv path, new_path
     end
-  end
-
-  def process_erb_file file
-    # Process the erb file
-    processed_file = ERB.new(File.read(file)).result(binding)
-
-    # Overwrite the original file with the processed file
-    File.open file, 'w' do |f|
-      f.write processed_file
-    end
-
-    # Remove the .erb from the file name
-    File.rename file, file.chomp('.erb')
   end
 
   # Allow templates to call option values directly

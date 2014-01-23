@@ -1,15 +1,15 @@
 require 'spec_helper'
 
 describe New::Cli do
-  describe '#templates' do
+  describe '#projects' do
     before do
       New.stub(:templates).and_return([:foo])
-      subject.stub(:template)
+      subject.stub(:project)
     end
 
     after do
       New.unstub(:templates)
-      subject.unstub(:template)
+      subject.unstub(:project)
     end
 
     it 'should accept template name as argument' do

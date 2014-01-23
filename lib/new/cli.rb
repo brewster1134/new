@@ -19,11 +19,11 @@ class New::Cli < Thor
       #   name: Thor::Option.new(:name, required: true, type: :string)
       )
 
-      # # The options hash is frozen in #initialize so you need to merge and re-assign
+      # The options hash is frozen in #initialize so you need to merge and re-assign
       self.options = options.merge(parser.parse(opts)).freeze
 
-      # # Dispatch the command
-      template method, name
+      # Dispatch the command
+      project method, name
     else
       super
     end
@@ -43,7 +43,7 @@ class New::Cli < Thor
       # create config file
       New.say 'Creating default configuration file.', type: :success
       File.open File.join(New::CUSTOM_DIR, New::CONFIG_FILE), 'w' do |f|
-        f.write New::Template::CUSTOM_CONFIG_TEMPLATE.to_yaml
+        f.write New::Project::CUSTOM_CONFIG_TEMPLATE.to_yaml
       end
 
       New.say "Edit #{File.join(New::CUSTOM_DIR, New::CONFIG_FILE)} with your custom configuration details.", type: :warn
@@ -69,7 +69,7 @@ class New::Cli < Thor
 
 private
 
-  def template template, name
-    New::Template.new template, name
+  def project template, name
+    New::Project.new template, name
   end
 end
