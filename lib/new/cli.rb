@@ -52,14 +52,18 @@ class New::Cli < Thor
 
   desc 'release', 'Release your new code (Run from within a project directory!)'
   def release
-    project_config_file = File.join(Dir.pwd, '.new')
+    project_config_file = File.join(Dir.pwd,  New::CONFIG_FILE)
     raise unless File.exists? project_config_file
 
-    project_config_object = YAML.load(File.open(project_config_file)).deep_symbolize_keys!
-    tasks = project_config_object[:tasks]
-
+    project_config = YAML.load(File.open(project_config_file)).deep_symbolize_keys!
+    tasks = project_config[:tasks].map{ |t| t.is_a?(Hash) ? t.keys.first.to_sym : t.to_sym }
     tasks.each do |task|
-      New::Task.new task, project_config_object
+      # require custom task if it exists
+      if New.custom_tasks.include? task
+        require "#{New::CUSTOM_DIR}/#{New::TASKS_DIR_NAME}/#{task}/#{task}"
+      else
+        require "#{New::DEFAULT_DIR}/#{New::TASKS_DIR_NAME}/#{task}/#{task}"
+      end
     end
   end
 

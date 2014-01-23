@@ -12,7 +12,7 @@ describe New do
 
   it 'should return an array of available tasks' do
     expect(New.tasks).to match_array [:foo_task, :custom_bar_task]
-    expect(New.default_tasks).to match_array [:foo_task]
+    expect(New.default_tasks).to match_array [:foo_task, :custom_bar_task]
     expect(New.custom_tasks).to match_array [:custom_bar_task]
   end
 

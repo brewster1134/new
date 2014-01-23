@@ -63,17 +63,20 @@ describe New::Cli do
 
     context 'for a valid project' do
       before do
+        stub_const 'New::DEFAULT_DIR', root('spec', 'fixtures')
+        stub_const 'New::CUSTOM_DIR', root('spec', 'fixtures', 'custom')
+        New::Task.stub(:inherited)
         Dir.chdir root('spec', 'fixtures', 'project')
-        New::Task.stub(:new)
         subject.release
       end
 
       after do
-        New::Task.unstub(:new)
+        New::Task.unstub(:inherited)
       end
 
-      it 'should run the project task methods' do
-        expect(New::Task).to have_received(:new).with(:foo_task, {:tasks=>[:foo_task]})
+      it 'should initialize the new task' do
+        expect(New::Task).to have_received(:inherited).with(New::Task::FooTask).once
+        expect(New::Task).to have_received(:inherited).with(New::Task::CustomBarTask).once
       end
     end
   end
