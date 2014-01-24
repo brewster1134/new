@@ -11,7 +11,7 @@ describe New::Task do
 
   describe '.inherited' do
     it 'should create a name form the class name' do
-      expect(New::Task.instance_variable_get('@name')).to eq :task_spec
+      expect(New::Task::TaskSpec.instance_variable_get('@name')).to eq :task_spec
     end
   end
 

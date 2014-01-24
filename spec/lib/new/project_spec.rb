@@ -24,7 +24,7 @@ describe New::Project do
     end
 
     it 'should not add the custom value' do
-      expect(project_config[:custom]).to be_nil
+      expect(project_config[:custom]).to be_false
     end
 
     it 'should create a new directory with the project name' do
@@ -36,12 +36,13 @@ describe New::Project do
     end
 
     it 'should add all the neccessary yaml info' do
-      expect(project_config[:type]).to eq :foo_template
-      expect(project_config[:project_name]).to eq project_name
-      expect(project_config[:developer][:name]).to eq 'Foo Bar'
       expect(project_config[:developer][:email]).to eq 'foo@bar.com'
+      expect(project_config[:developer][:name]).to eq 'Foo Bar'
       expect(project_config[:license]).to eq 'MIT'
-      expect(project_config[:tasks]).to eq({ foo_task: nil }) # from template specific config file
+      expect(project_config[:project_name]).to eq project_name
+      expect(project_config[:tasks][:foo_task]).to be_nil
+      expect(project_config[:tasks][:github][:username]).to eq '[USERNAME]'
+      expect(project_config[:type]).to eq :foo_template
     end
 
     it 'should process and rename .erb files' do

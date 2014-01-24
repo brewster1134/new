@@ -7,8 +7,10 @@ class New::Project
   FILENAME_RENAME_MATCH = /\[([A-Z_.]+)\]/
   CUSTOM_CONFIG_TEMPLATE = {
     license: '[LICENSE]',
-    github: {
-      username: '[USERNAME]'
+    tasks: {
+      github: {
+        username: '[USERNAME]'
+      }
     },
     developer: {
       name: '[NAME]',
@@ -20,6 +22,7 @@ class New::Project
   #
   def initialize template, name
     @options = {}
+    @project_dir = File.join(Dir.pwd, name) # the newly created project directory
 
     set_options template, name
     copy_template
@@ -33,7 +36,6 @@ private
   # Create the options object
   #
   def set_options template, name
-    @project_dir = File.join(Dir.pwd, name)   # the newly created project directory
     @template_dir = get_template_dir template # the template directory to copy
 
     # Check for custom config file
@@ -41,12 +43,14 @@ private
     template_config_file = YAML.load(File.open(File.join(@template_dir, New::CONFIG_FILE))).deep_symbolize_keys! rescue {}
 
     # merge options together
-    config = CUSTOM_CONFIG_TEMPLATE.clone.merge!(custom_config_file).merge!(template_config_file).merge!({
-      type: template,
-      project_name: name
-    })
-
-    @options.merge! config
+    @options
+      .deep_merge!(CUSTOM_CONFIG_TEMPLATE.clone)
+      .deep_merge!(custom_config_file)
+      .deep_merge!(template_config_file)
+      .deep_merge!({
+        type: template,
+        project_name: name
+      })
 
     # Convert options to OpenStruct so we can use dot notation in the templates
     @template_options = RecursiveOpenStruct.new(@options)

@@ -2,11 +2,15 @@ require 'yaml'
 
 class New::Task
   def self.inherited task_class
-    @name = caller.first[/[a-z_]+?(?=\.rb)/].to_sym
+    task_class.name = caller.first[/[a-z_]+?(?=\.rb)/].to_sym
   end
 
   def initialize project_config
     @project_config = project_config
+  end
+
+  def self.name= name
+    @name = name
   end
 
   def options

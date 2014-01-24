@@ -51,8 +51,8 @@ private
 end
 
 require 'new/cli'
+require 'new/core'
 require 'new/dsl'
-require 'new/objects'
 require 'new/project'
 require 'new/task'
 
