@@ -11,6 +11,8 @@ RSpec.configure do |config|
 
   config.before do
     New.stub(:say)
+    stub_const 'New::DEFAULT_DIR', root('spec', 'fixtures')
+    stub_const 'New::CUSTOM_DIR', root('spec', 'fixtures', 'custom')
   end
 
   config.before :each do

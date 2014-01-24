@@ -3,17 +3,17 @@ require 'yaml'
 class New::Task
   def self.inherited task_class
     @name = caller.first[/[a-z_]+?(?=\.rb)/].to_sym
-    task_class.new get_options
   end
 
-private
-
-  def self.get_options
-    @options ||= #YAML.load(File.open(project_config_file)).deep_symbolize_keys!
+  def initialize project_config
+    @project_config = project_config
   end
 
-  def get_task
-    if New.custom_tasks.include? @name
-    end
+  def options
+    default_task_options = self.class::OPTIONS rescue {}
+    custom_task_options = New.custom_config[:tasks][@name] rescue {}
+    project_task_options = @project_config[:tasks][@name] rescue {}
+
+    @options ||= default_task_options.merge(custom_task_options).merge(project_task_options)
   end
 end

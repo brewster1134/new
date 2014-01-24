@@ -1,3 +1,4 @@
+require 'active_support/core_ext/string/inflections'
 require 'thor'
 require 'yaml'
 
@@ -55,15 +56,25 @@ class New::Cli < Thor
     project_config_file = File.join(Dir.pwd,  New::CONFIG_FILE)
     raise unless File.exists? project_config_file
 
+    # get project config file
     project_config = YAML.load(File.open(project_config_file)).deep_symbolize_keys!
-    tasks = project_config[:tasks].map{ |t| t.is_a?(Hash) ? t.keys.first.to_sym : t.to_sym }
+
+    # extract tasks from configuration
+    tasks = (project_config[:tasks] rescue { tasks: [] }).keys.map(&:to_sym)
+
     tasks.each do |task|
-      # require custom task if it exists
-      if New.custom_tasks.include? task
-        require "#{New::CUSTOM_DIR}/#{New::TASKS_DIR_NAME}/#{task}/#{task}"
-      else
-        require "#{New::DEFAULT_DIR}/#{New::TASKS_DIR_NAME}/#{task}/#{task}"
+      # require custom task and initialize it
+      begin
+        if New.custom_tasks.include? task
+          require "#{New::CUSTOM_DIR}/#{New::TASKS_DIR_NAME}/#{task}/#{task}"
+        else
+          require "#{New::DEFAULT_DIR}/#{New::TASKS_DIR_NAME}/#{task}/#{task}"
+        end
+      rescue LoadError
+        New.say "No task '#{task}' found!", type: :fail
+        next
       end
+      "New::Task::#{task.to_s.classify}".constantize.new project_config
     end
   end
 

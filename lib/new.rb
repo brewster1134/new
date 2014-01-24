@@ -34,6 +34,10 @@ class New
     @custom_templates ||= get_list TASKS_DIR_NAME, :custom
   end
 
+  def self.custom_config
+    YAML.load(File.open(File.join(CUSTOM_DIR, CONFIG_FILE))).deep_symbolize_keys! rescue {}
+  end
+
 private
 
   def self.get_list dir, filter

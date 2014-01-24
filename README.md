@@ -14,17 +14,28 @@ new [TEMPLATE] [NAME]
 ##### Custom Templates
 Copy or create folders in your `~/.new/templates` folder.
 
-_These templates will take precendence over the default templates included with the gem._
+_Note: These templates will take precendence over the default templates included with the gem._
+
+###### Requirements
+Template need to have a `.new` file in the root.
+
+```yaml
+tasks:
+  foo:
+  bar:
+    option: baz
+```
+
+_Note: the tasks are followed by a colon (:) whether they have options or not _
 
 ###### Interpolation
 Use ERB template syntax in your files to interpolate template data.  Make sure to add `.erb` to the end of the filename.
 
-You can also access any custom values set in your `~/.new` config file.
+You can also access any custom values set in your `~/.new/.new` config file.
 
 _`foo.txt.erb`_
 ```erb
 <%= license %>
-<%= github.username %>
 <%= developer.name %>
 <%= developer.email %>
 <%= type %>
@@ -32,10 +43,9 @@ _`foo.txt.erb`_
 <%= custom %>
 ```
 
-
 You can also interpolate directory and filenames using the syntax `foo_[DEVELOPER.NAME].txt`
 
-_Notice that you can access nested values using the dot notation._
+_Note using the dot notation to access nested attributes._
 
 ##### TODO
 * common rake tasks (eg push to github)

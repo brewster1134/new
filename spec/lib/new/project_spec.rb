@@ -10,11 +10,6 @@ describe New::Project do
     Dir.chdir root('.tmp')
   end
 
-  before do
-    stub_const 'New::DEFAULT_DIR', root('spec', 'fixtures')
-    stub_const 'New::CUSTOM_DIR', root('spec', 'fixtures', 'custom')
-  end
-
   after do
     FileUtils.rm_rf root('.tmp', project_name)
   end
@@ -46,7 +41,7 @@ describe New::Project do
       expect(project_config[:developer][:name]).to eq 'Foo Bar'
       expect(project_config[:developer][:email]).to eq 'foo@bar.com'
       expect(project_config[:license]).to eq 'MIT'
-      expect(project_config[:tasks]).to eq [:foo] # from template specific config file
+      expect(project_config[:tasks]).to eq({ foo_task: nil }) # from template specific config file
     end
 
     it 'should process and rename .erb files' do

@@ -37,7 +37,7 @@ private
     @template_dir = get_template_dir template # the template directory to copy
 
     # Check for custom config file
-    custom_config_file = YAML.load(File.open(File.join(New::CUSTOM_DIR, New::CONFIG_FILE))).deep_symbolize_keys! rescue {}
+    custom_config_file = New.custom_config
     template_config_file = YAML.load(File.open(File.join(@template_dir, New::CONFIG_FILE))).deep_symbolize_keys! rescue {}
 
     # merge options together

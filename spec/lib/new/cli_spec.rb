@@ -36,16 +36,16 @@ describe New::Cli do
     end
 
     it 'should create .new dir' do
-      expect(Dir.exists?(root('.tmp', '.new')))
+      expect(Dir.exists?(root('.tmp', '.new'))).to be_true
     end
 
     it 'should create .new file' do
-      expect(File.exists?(root('.tmp', '.new', '.new')))
+      expect(File.exists?(root('.tmp', '.new', '.new'))).to be_true
     end
 
     it 'should create an empty templates & tasks dir' do
-      expect(Dir.exists?(root('.tmp', '.new', 'templates')))
-      expect(Dir.exists?(root('.tmp', '.new', 'tasks')))
+      expect(Dir.exists?(root('.tmp', '.new', 'templates'))).to be_true
+      expect(Dir.exists?(root('.tmp', '.new', 'tasks'))).to be_true
     end
   end
 
@@ -63,20 +63,41 @@ describe New::Cli do
 
     context 'for a valid project' do
       before do
-        stub_const 'New::DEFAULT_DIR', root('spec', 'fixtures')
-        stub_const 'New::CUSTOM_DIR', root('spec', 'fixtures', 'custom')
-        New::Task.stub(:inherited)
         Dir.chdir root('spec', 'fixtures', 'project')
-        subject.release
       end
 
-      after do
-        New::Task.unstub(:inherited)
+      # test that the task is required
+      describe 'require' do
+        before do
+          New::Task.stub(:inherited)
+          subject.release
+        end
+
+        after do
+          New::Task.unstub(:inherited)
+        end
+
+        it 'should require the task' do
+          expect(New::Task).to have_received(:inherited).with(New::Task::FooTask).once
+        end
       end
 
-      it 'should initialize the new task' do
-        expect(New::Task).to have_received(:inherited).with(New::Task::FooTask).once
-        expect(New::Task).to have_received(:inherited).with(New::Task::CustomBarTask).once
+      # test that the task is initialized
+      describe 'initialize' do
+        before do
+          require root('spec', 'fixtures', 'custom', 'tasks', 'custom_bar_task', 'custom_bar_task')
+          New::Task::CustomBarTask.stub(:new)
+          stub_const 'New::CONFIG_FILE', '.new_cli_release_spec'
+          subject.release
+        end
+
+        after do
+          New::Task::CustomBarTask.unstub(:new)
+        end
+
+        it 'should initialize the task' do
+          expect(New::Task::CustomBarTask).to have_received(:new).with({ tasks: { custom_bar_task: nil }})
+        end
       end
     end
   end

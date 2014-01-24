@@ -1,11 +1,6 @@
 require 'spec_helper'
 
 describe New do
-  before do
-    stub_const 'New::DEFAULT_DIR', root('spec', 'fixtures')
-    stub_const 'New::CUSTOM_DIR', root('spec', 'fixtures', 'custom')
-  end
-
   it 'should return a version' do
     expect(New::VERSION).to match /[0-9]+.[0-9]+.[0-9]+/
   end
