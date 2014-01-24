@@ -20,7 +20,7 @@ describe New::Project do
     end
 
     it 'should set the template' do
-      expect(options.type).to eq :foo_template
+      expect(options.type).to eq 'foo_template'
     end
 
     it 'should not add the custom value' do
@@ -42,7 +42,7 @@ describe New::Project do
       expect(project_config[:project_name]).to eq project_name
       expect(project_config[:tasks][:foo_task]).to be_nil
       expect(project_config[:tasks][:github][:username]).to eq '[USERNAME]'
-      expect(project_config[:type]).to eq :foo_template
+      expect(project_config[:type]).to eq 'foo_template'
     end
 
     it 'should process and rename .erb files' do

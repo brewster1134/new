@@ -48,7 +48,7 @@ private
       .deep_merge!(custom_config_file)
       .deep_merge!(template_config_file)
       .deep_merge!({
-        type: template,
+        type: template.to_s,
         project_name: name
       })
 
