@@ -18,6 +18,6 @@ class New::Task
     custom_task_options = New.custom_config[:tasks][@name] rescue {}
     project_task_options = @project_config[:tasks][@name] rescue {}
 
-    @options ||= default_task_options.merge(custom_task_options).merge(project_task_options)
+    @options ||= default_task_options.deep_merge(custom_task_options).deep_merge(project_task_options)
   end
 end

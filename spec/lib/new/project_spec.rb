@@ -40,9 +40,10 @@ describe New::Project do
       expect(project_config[:developer][:name]).to eq 'Foo Bar'
       expect(project_config[:license]).to eq 'MIT'
       expect(project_config[:project_name]).to eq project_name
-      expect(project_config[:tasks][:foo_task]).to be_nil
+      expect(project_config[:tasks][:foo_task]).to eq({ foo: 'custom', custom: true, template: true })
       expect(project_config[:tasks][:github][:username]).to eq '[USERNAME]'
       expect(project_config[:type]).to eq 'foo_template'
+      expect(project_config[:foo]).to eq 'bar'
     end
 
     it 'should process and rename .erb files' do

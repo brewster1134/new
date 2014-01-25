@@ -7,6 +7,7 @@ class New::Project
   FILENAME_RENAME_MATCH = /\[([A-Z_.]+)\]/
   CUSTOM_CONFIG_TEMPLATE = {
     license: '[LICENSE]',
+    templates: {},
     tasks: {
       github: {
         username: '[USERNAME]'
@@ -38,15 +39,14 @@ private
   def set_options template, name
     @template_dir = get_template_dir template # the template directory to copy
 
-    # Check for custom config file
-    custom_config_file = New.custom_config
     template_config_file = YAML.load(File.open(File.join(@template_dir, New::CONFIG_FILE))).deep_symbolize_keys! rescue {}
+    custom_config_file = New.custom_config
 
     # merge options together
     @options
       .deep_merge!(CUSTOM_CONFIG_TEMPLATE.clone)
-      .deep_merge!(custom_config_file)
       .deep_merge!(template_config_file)
+      .deep_merge!(custom_config_file)
       .deep_merge!({
         type: template.to_s,
         project_name: name
