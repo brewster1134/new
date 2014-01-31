@@ -43,7 +43,7 @@ class New::Cli < Thor
       # create config file
       New.say 'Creating default configuration file.', type: :success
       File.open File.join(New::CUSTOM_DIR, New::CONFIG_FILE), 'w' do |f|
-        f.write New::Project::CUSTOM_CONFIG_TEMPLATE.to_yaml
+        f.write New::Template::CUSTOM_CONFIG_TEMPLATE.to_yaml
       end
 
       New.say "Edit #{File.join(New::CUSTOM_DIR, New::CONFIG_FILE)} with your custom configuration details.", type: :warn
