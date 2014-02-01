@@ -4,6 +4,7 @@ class New::Task::TaskSpec < New::Task
   OPTIONS = {
     default: true
   }
+  def run; end
 end
 
 describe New::Task do

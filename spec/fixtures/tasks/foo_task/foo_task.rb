@@ -3,4 +3,5 @@ class New::Task::FooTask < New::Task
     foo: 'default',
     default: true
   }
+  def run; end
 end

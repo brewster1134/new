@@ -59,7 +59,7 @@ class New::Cli < Thor
     project_config = YAML.load(File.open(project_config_file)).deep_symbolize_keys!
 
     # extract tasks from configuration
-    tasks = (project_config[:tasks] rescue { tasks: [] }).keys.map(&:to_sym)
+    tasks = (project_config[:tasks] || {}).keys.map(&:to_sym)
 
     tasks.each do |task|
       # require custom task and initialize it

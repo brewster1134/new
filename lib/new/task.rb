@@ -7,6 +7,7 @@ class New::Task
 
   def initialize project_config
     @project_config = project_config
+    run
   end
 
   def self.name= name
