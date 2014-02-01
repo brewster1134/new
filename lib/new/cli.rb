@@ -80,6 +80,15 @@ class New::Cli < Thor
 private
 
   def project template, name
+    if Dir.exists? File.join(Dir.pwd, name)
+      New.say "A project named #{name} already exists...", type: :warn
+      New.say "                       Overwrite it? [Yn]", type: :warn
+      exit if STDIN.gets.chomp! != 'Y'
+
+      # Delete existing project
+      FileUtils.rm_rf File.join(Dir.pwd, name)
+    end
+
     New::Project.new template, name
   end
 end

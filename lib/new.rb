@@ -1,3 +1,5 @@
+require 'yaml'
+
 class New
   VERSION = '0.0.1'
   DEFAULT_DIR = File.expand_path('../..', __FILE__)

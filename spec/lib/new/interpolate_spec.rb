@@ -31,7 +31,7 @@ describe New::Interpolate do
   end
 
   it 'should create dot notation accessible options' do
-    expect(@obj.options.foo.bar).to eq('baz')
+    expect(@obj.dot_options.foo.bar).to eq('baz')
   end
 
   it 'should respond to options as methods' do

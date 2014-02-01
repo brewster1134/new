@@ -1,13 +1,10 @@
-require 'recursive-open-struct'
-require 'yaml'
-
 class New::Project
   include New::Interpolate
 
   # Create all variables and run new project creation methods
   #
   def initialize template, name
-    @project_dir = File.join(Dir.pwd, name) # the newly created project directory\
+    @project_dir = File.join(Dir.pwd, name.to_s) # the newly created project directory
     @template = New::Template.new template, name
 
     copy_template
@@ -20,6 +17,9 @@ private
   #
   def copy_template
     FileUtils.cp_r @template.dir, @project_dir
+
+    # cleanup tmp
+    FileUtils.rm_rf @template.dir
   end
 
   # Create the .new configuration file in the new project

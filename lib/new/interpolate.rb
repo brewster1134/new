@@ -1,4 +1,5 @@
 require 'erb'
+require 'recursive-open-struct'
 
 module New::Interpolate
   # regex to match capital underscored template options names ie [PROJECT_NAME]
@@ -19,7 +20,7 @@ module New::Interpolate
 
   # Convert options to OpenStruct so we can use dot notation in the templates
   #
-  def options
+  def dot_options
     @dot_options ||= RecursiveOpenStruct.new(@options)
   end
 
@@ -28,7 +29,7 @@ private
   # Allow templates to call option values directly
   #
   def method_missing method
-    options.send(method.to_sym) || super
+    dot_options.send(method.to_sym) || super
   end
 
   def copy_to_tmp
@@ -58,7 +59,7 @@ private
       methods = $1.downcase.split('.').map(&:to_sym)
 
       # Call each method on options
-      methods.inject(options){ |options, method| options.send(method.to_sym) }
+      methods.inject(dot_options){ |options, method| options.send(method.to_sym) }
     end
 
     if File.file? path

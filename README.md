@@ -1,11 +1,18 @@
 # new
-Opinionated Project Creation
-
-#### Usage
+###### install
 ```shell
 gem install new
 new init
+```
+
+###### Create a new project
+```shell
 new [TEMPLATE] [NAME]
+```
+
+###### Release a new version
+```shell
+new release
 ```
 
 #### Templates
@@ -82,7 +89,7 @@ _Note using the dot notation to access nested attributes._
 * The directory name will be used for the task name
 * A `.rb` file must be included in the directory with the same name
 * The `.rb` file must contain a class of `New::Task::FooTask` and inherit from `New::Task`
-* The `.rb` file must have a standard ruby `initialize` method that will run when a project is released.
+* The `.rb` file must have a standard ruby `run` method that will run when a project is released.
 * A Task can have an `OPTIONS` constant with default options needed for the task to run.  These can be further customized in the project or local configuration `.new` file
 
 ```ruby
@@ -93,13 +100,15 @@ class New::Task::FooTask < New::Test
     foo: 'bar'
   }
 
-  def initialize
+  def run
     # do stuff here
+    # access the project options from the `options` object
   end
 end
 ```
 
 #### TODO
+* optional scripts when creating a template
 * write templates
 * write tasks
 
