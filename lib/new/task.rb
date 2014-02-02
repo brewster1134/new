@@ -13,12 +13,26 @@ class New::Task
   def self.name= name
     @name = name
   end
+  def self.name; @name; end
+  def name; self.class.name.to_sym; end
 
+  # Return ALL available options
+  #
+  def project_options
+    custom_options = New.custom_config
+    project_options = @project_config
+
+    all_options = custom_options.deep_merge(project_options)
+    all_options[:tasks] ||= {}
+    all_options[:tasks][name] ||= {}
+
+    @project_options ||= all_options
+  end
+
+  # Return only the options for the given task
+  #
   def options
-    default_task_options = self.class::OPTIONS rescue {}
-    custom_task_options = New.custom_config[:tasks][@name] rescue {}
-    project_task_options = @project_config[:tasks][@name] rescue {}
-
-    @options ||= default_task_options.deep_merge(custom_task_options).deep_merge(project_task_options)
+    default_options = self.class::OPTIONS rescue {}
+    @options ||= default_options.deep_merge(project_options[:tasks][name])
   end
 end

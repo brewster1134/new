@@ -102,7 +102,8 @@ class New::Task::FooTask < New::Test
 
   def run
     # do stuff here
-    # access the project options from the `options` object
+    # access task options from the `options` object
+    # access all project options from the `project_options` object
   end
 end
 ```
