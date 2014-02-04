@@ -26,6 +26,12 @@ describe New::Task do
       task.unstub(:name)
     end
 
+    it 'should not merge other tasks in' do
+      # make sure the custom config has the extra task, and make sure it doesnt come through to the task
+      expect(YAML.load(File.open(root('spec', 'fixtures', 'custom', New::CONFIG_FILE))).deep_symbolize_keys![:tasks].has_key?(:dont_include)).to be_true
+      expect(task.project_options[:tasks].has_key?(:dont_include)).to be_false
+    end
+
     it 'should get the correct task options' do
       expect(task.options).to eq({ foo: 'project', project: true, custom: true, default: true })
     end

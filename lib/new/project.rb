@@ -1,5 +1,5 @@
 class New::Project
-  include New::Interpolate
+  include New::Version
 
   # Create all variables and run new project creation methods
   #

@@ -1,9 +1,12 @@
 module New::Dsl
   # Replacement for `puts` that accepts various stylistic arguments
-  # type:  =>  [symbol] Preset colors for [:fail, :success, :warn]
-  # color:  => [integer] See docs for #colorize for color codes
-  # justify: => [center|ljust|rjust] The type of justification to use
-  # padding: => [integer] The maximum string size to justify text in
+  # https://github.com/fazibear/colorize/blob/master/lib/colorize.rb
+  #
+  # justify:  => [center|ljust|rjust] The type of justification to use
+  # padding:  => [integer] The maximum string size to justify text in
+  # color:    => [integer] See link above for supported colors
+  # bgcolor:  => [integer] See link above for supported colors
+  # type:     => [symbol] Preset colors for [:fail, :success, :warn]
   #
   def say text = '', args = {}
     # Justify options
@@ -11,17 +14,23 @@ module New::Dsl
       text = text.send args[:justify], args[:padding]
     end
 
+    # Color text
+    text = text.colorize(color: args[:color]) if args[:color]
+
+    # Color background
+    text = text.colorize(background: args[:bgcolor]) if args[:bgcolor]
+
     # Type options
     # process last due to the addition of special color codes
     text = case args[:type]
     when :fail
-      colorize text, 31
+      text.red
     when :success
-      colorize text, 32
+      text.green
     when :warn
-      colorize text, 33
+      text.yellow
     else
-      colorize text, args[:color]
+      text
     end
 
     if args[:indent]
@@ -29,16 +38,5 @@ module New::Dsl
     end
 
     puts text
-  end
-
-private
-
-  # Output text with a certain color (or style)
-  # Reference for color codes
-  # https://github.com/flori/term-ansicolor/blob/master/lib/term/ansicolor.rb
-  #
-  def colorize text, color_code
-    return text unless color_code
-    "\e[#{color_code}m#{text}\e[0m"
   end
 end

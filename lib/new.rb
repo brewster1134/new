@@ -53,10 +53,16 @@ private
   end
 end
 
-require 'new/cli'
+# core
 require 'new/core'
+
+# modules
 require 'new/dsl'
 require 'new/interpolate'
+require 'new/version'
+
+# classes
+require 'new/cli'
 require 'new/project'
 require 'new/template'
 require 'new/task'

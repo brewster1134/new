@@ -33,7 +33,13 @@ private
   end
 
   def copy_to_tmp
+    # Create a unique temporary path to store the processed files
     @dest_path = File.join(New::TEMP_DIR, Time.now.to_i.to_s)
+
+    # Create a directory if an individual file is being processed
+    FileUtils.mkdir_p @dest_path if File.file? @src_path
+
+    # Copy to tmp
     FileUtils.cp_r @src_path, @dest_path
   end
 

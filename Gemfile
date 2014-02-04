@@ -1,7 +1,9 @@
 source 'https://rubygems.org'
 
 gem 'activesupport'
+gem 'colorize'
 gem 'recursive-open-struct'
+gem 'semantic'
 gem 'thor'
 
 group :development do

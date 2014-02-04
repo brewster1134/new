@@ -8,6 +8,7 @@ describe New::Interpolate do
   let(:template_dir){ root('spec', 'fixtures', 'templates', 'foo_template') }
 
   before do
+    # don't use let. since interpolate creates files, we only want to generate files once to test aginst.
     @obj = InterpolateSpec.new
     @obj.interpolate(template_dir, {
       'foo' => {

@@ -7,12 +7,7 @@ class New::Template
   #
   CUSTOM_CONFIG_TEMPLATE = {
     license: '[LICENSE]',
-    templates: {},
-    tasks: {
-      github: {
-        username: '[USERNAME]'
-      }
-    },
+    version: '[VERSION]',
     developer: {
       name: '[NAME]',
       email: '[EMAIL]'
@@ -34,8 +29,8 @@ class New::Template
       .deep_merge!(template_config)
       .deep_merge!(New.custom_config)
       .deep_merge!({
-        type: @type.to_s,
-        project_name: @name
+        project_name: @name,
+        type: @type.to_s
       })
   end
 

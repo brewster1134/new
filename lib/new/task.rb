@@ -23,8 +23,11 @@ class New::Task
     project_options = @project_config
 
     all_options = custom_options.deep_merge(project_options)
-    all_options[:tasks] ||= {}
-    all_options[:tasks][name] ||= {}
+
+    # Groom tasks (prevent tasks from the custom config from polluting the project config)
+    all_options[:tasks].each_key do |task|
+      all_options[:tasks].delete(task) unless project_options[:tasks].has_key?(task)
+    end
 
     @project_options ||= all_options
   end
