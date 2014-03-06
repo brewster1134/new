@@ -1,0 +1,20 @@
+---
+license: MIT
+developer:
+  name: Ryan Brewster
+  email: brewster1134@gmail.com
+tasks:
+  gem:
+    gemspec:
+      summary: A Quick & Custom Project Creation & Release Tool
+      description: With custom templates and tasks, quickly create a new project and
+        release it to the world.
+      homepage: https://github.com/brewster1134/new
+      executables:
+      - new
+      bindir: bin
+      test_files:
+      - spec/**/*.rb
+version: 0.0.10
+project_name: new
+type: js

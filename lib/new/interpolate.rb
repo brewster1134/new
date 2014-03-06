@@ -16,7 +16,9 @@ module New::Interpolate
     process_files
   end
 
-  def dir; @dest_path; end
+  def dir
+    File.file?(@src_path) ? @dest_path : File.join(@dest_path, File.basename(@src_path))
+  end
 
   # Convert options to OpenStruct so we can use dot notation in the templates
   #
@@ -34,10 +36,7 @@ private
 
   def copy_to_tmp
     # Create a unique temporary path to store the processed files
-    @dest_path = File.join(New::TEMP_DIR, Time.now.to_i.to_s)
-
-    # Create a directory if an individual file is being processed
-    FileUtils.mkdir_p @dest_path if File.file? @src_path
+    @dest_path = Dir.mktmpdir
 
     # Copy to tmp
     FileUtils.cp_r @src_path, @dest_path

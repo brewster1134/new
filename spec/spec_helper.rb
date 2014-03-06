@@ -1,6 +1,8 @@
 $: << File.expand_path('../../lib', __FILE__)
-$: << File.expand_path('../fixtures', __FILE__)
 require 'new'
+$: << File.expand_path('../../tasks', __FILE__)
+$: << File.expand_path('../fixtures', __FILE__)
+$: << File.expand_path('tasks', New::CUSTOM_DIR)
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
@@ -23,4 +25,23 @@ end
 
 def root *paths
   paths.unshift(File.expand_path('../../', __FILE__)).compact.join '/'
+end
+
+def require_task task
+  require "#{task}/#{task}"
+end
+
+def new_task task, options = {}
+  task_class = "New::Task::#{task.to_s.classify}".constantize
+
+  task_class.any_instance.stub(:get_part).and_return(:patch)
+  task_class.any_instance.stub(:run)
+
+  task_hash = {}
+  task_hash[task] = {}
+  task_options = {
+    tasks: task_hash
+  }.merge(options)
+
+  task_class.new task_options
 end
