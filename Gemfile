@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'activesupport'
+gem 'activesupport', '~> 4.0'
 gem 'colorize'
 gem 'rake'
 gem 'recursive-open-struct'
