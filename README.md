@@ -19,7 +19,7 @@ new release
 Templates represent a boilerplate directory & file structure preconfigured for a given project type. _(eg js, ruby, gem, rails, etc.)_
 
 #### Tasks
-Tasks represent a process associated with releasing new code.  Tasks are run in order they are listed in the project `.new` configuration file. _(eg github, gem, etc.)_
+Tasks represent a process associated with releasing new code.  Tasks are run in order they are listed in the project `.new` configuration file.
 
 #### Local Config/Templates/Tasks
 After running `new init`, you will have `.new` folder in your home directory.  This directory contains:
@@ -96,12 +96,19 @@ _Note using the dot notation to access nested attributes._
 # ~/.new/tasks/foo_task/foo_task.rb
 
 class New::Task::FooTask < New::Test
+  include New::Interpolate  # if you need to interpolate files
+  include New::version      # if you need to set & manage a semantic version
+
+  # defaults for required options
   OPTION = {
     foo: 'bar'
   }
 
+  # required `run` method
   def run
-    # do stuff here
+    # do task stuff here
+
+    access
     # access task options from the `options` object
     # access all project options from the `project_options` object
   end
@@ -110,6 +117,7 @@ end
 
 #### TODO
 * optional scripts when creating a template
+* make releasing and newing more verbose
 * write templates
 * write tasks
 

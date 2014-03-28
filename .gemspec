@@ -1,0 +1,27 @@
+# coding: utf-8
+Gem::Specification.new do |s|
+  s.author = 'Ryan Brewster'
+  s.bindir = 'bin'
+  s.date = '2014-03-26'
+  s.description = 'With custom templates and tasks, quickly create a new project and release it to the world.'
+  s.email = 'brewster1134@gmail.com'
+  s.executables = ["new"]
+  s.files = ["Gemfile", "Gemfile.lock", "Guardfile", "LICENSE.txt", "README.md", "bin/new", "doc/Gemfile.html", "doc/Gemfile_lock.html", "doc/Guardfile.html", "doc/InterpolateSpec.html", "doc/LICENSE_txt.html", "doc/New.html", "doc/New/Cli.html", "doc/New/Dsl.html", "doc/New/Interpolate.html", "doc/New/Project.html", "doc/New/Task.html", "doc/New/Task/CustomBarTask.html", "doc/New/Task/FooTask.html", "doc/New/Task/Gem.html", "doc/New/Task/TaskSpec.html", "doc/New/Template.html", "doc/New/Version.html", "doc/Object.html", "doc/README_md.html", "doc/VersionSpec.html", "doc/created.rid", "doc/fonts.css", "doc/fonts/Lato-Light.ttf", "doc/fonts/Lato-LightItalic.ttf", "doc/fonts/Lato-Regular.ttf", "doc/fonts/Lato-RegularItalic.ttf", "doc/fonts/SourceCodePro-Bold.ttf", "doc/fonts/SourceCodePro-Regular.ttf", "doc/images/add.png", "doc/images/arrow_up.png", "doc/images/brick.png", "doc/images/brick_link.png", "doc/images/bug.png", "doc/images/bullet_black.png", "doc/images/bullet_toggle_minus.png", "doc/images/bullet_toggle_plus.png", "doc/images/date.png", "doc/images/delete.png", "doc/images/find.png", "doc/images/loadingAnimation.gif", "doc/images/macFFBgHack.png", "doc/images/package.png", "doc/images/page_green.png", "doc/images/page_white_text.png", "doc/images/page_white_width.png", "doc/images/plugin.png", "doc/images/ruby.png", "doc/images/tag_blue.png", "doc/images/tag_green.png", "doc/images/transparent.png", "doc/images/wrench.png", "doc/images/wrench_orange.png", "doc/images/zoom.png", "doc/index.html", "doc/js/darkfish.js", "doc/js/jquery.js", "doc/js/navigation.js", "doc/js/search.js", "doc/js/search_index.js", "doc/js/searcher.js", "doc/rdoc.css", "doc/spec/fixtures/custom/templates/custom_bar_template/custom_bar_txt.html", "doc/table_of_contents.html", "doc/tasks/gem/README_md.html", "doc/templates/js/Gemfile.html", "doc/templates/js/Guardfile.html", "doc/templates/js/lib/README_md.html", "doc/templates/js/spec/spec_helper_js_coffee.html", "doc/templates/js/spec/vendor/chai_js.html", "doc/templates/js/spec/vendor/sinon-chai_js.html", "doc/templates/js/spec/vendor/sinon_js.html", "doc/templates/js/src/README_md.html", "lib/new.rb", "lib/new/cli.rb", "lib/new/core.rb", "lib/new/dsl.rb", "lib/new/interpolate.rb", "lib/new/project.rb", "lib/new/task.rb", "lib/new/template.rb", "lib/new/version.rb", "spec/fixtures/custom/tasks/custom_bar_task/custom_bar_task.rb", "spec/fixtures/custom/templates/custom_bar_template/custom_bar.txt", "spec/fixtures/tasks/custom_bar_task/custom_bar_task.rb", "spec/fixtures/tasks/foo_task/Gemfile", "spec/fixtures/tasks/foo_task/foo_task.rb", "spec/fixtures/templates/foo_template/[FOO.BAR].txt.erb", "spec/fixtures/templates/foo_template/nested_[FOO.BAR]/foo.txt.erb", "spec/lib/new/cli_spec.rb", "spec/lib/new/interpolate_spec.rb", "spec/lib/new/project_spec.rb", "spec/lib/new/task_spec.rb", "spec/lib/new/template_spec.rb", "spec/lib/new/version_spec.rb", "spec/lib/new_spec.rb", "spec/spec_helper.rb", "tasks/gem/README.md", "tasks/gem/gem.rb", "tasks/gem/gem_spec.rb", "templates/js/Gemfile", "templates/js/Guardfile", "templates/js/LICENSE-MIT.erb", "templates/js/README.md.erb", "templates/js/demo/index.html.erb", "templates/js/lib/README.md", "templates/js/spec/[PROJECT_NAME].spec.js.coffee.erb", "templates/js/spec/index.html.erb", "templates/js/spec/spec_helper.js.coffee", "templates/js/spec/vendor/chai.js", "templates/js/spec/vendor/sinon-chai.js", "templates/js/spec/vendor/sinon.js", "templates/js/src/README.md", "templates/js/src/[PROJECT_NAME].js.coffee.erb", "templates/js/testem.yml", ".gitignore", ".gitmodules", ".new", ".rspec", "doc/.git", "spec/fixtures/custom/.new", "spec/fixtures/custom/templates/custom_bar_template/.new", "spec/fixtures/project/.new", "spec/fixtures/project/.new_cli_release_spec", "spec/fixtures/templates/custom_bar_template/.gitkeep", "spec/fixtures/templates/foo_template/.new", "tasks/gem/.gemspec.erb", "templates/js/.gitignore", "templates/js/.new"]
+  s.homepage = 'https://github.com/brewster1134/new'
+  s.license = 'MIT'
+  s.name = 'new'
+  s.summary = 'A Quick & Custom Project Creation & Release Tool'
+  s.test_files = ["spec/fixtures/custom/tasks/custom_bar_task/custom_bar_task.rb", "spec/fixtures/tasks/custom_bar_task/custom_bar_task.rb", "spec/fixtures/tasks/foo_task/foo_task.rb", "spec/lib/new/cli_spec.rb", "spec/lib/new/interpolate_spec.rb", "spec/lib/new/project_spec.rb", "spec/lib/new/task_spec.rb", "spec/lib/new/template_spec.rb", "spec/lib/new/version_spec.rb", "spec/lib/new_spec.rb", "spec/spec_helper.rb"]
+  s.version = '0.0.10'
+  s.add_runtime_dependency 'activesupport', '>= 0'
+  s.add_runtime_dependency 'colorize', '>= 0'
+  s.add_runtime_dependency 'rake', '>= 0'
+  s.add_runtime_dependency 'recursive-open-struct', '>= 0'
+  s.add_runtime_dependency 'semantic', '>= 0'
+  s.add_runtime_dependency 'thor', '>= 0'
+  s.add_development_dependency 'guard', '>= 0'
+  s.add_development_dependency 'guard-bundler', '>= 0'
+  s.add_development_dependency 'guard-rspec', '>= 0'
+  s.add_development_dependency 'rspec', '>= 0'
+  s.add_development_dependency 'terminal-notifier-guard', '>= 0'
+end

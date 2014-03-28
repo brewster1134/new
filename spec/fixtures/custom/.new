@@ -1,0 +1,14 @@
+license: MIT
+custom: true
+developer:
+  name: Foo Bar
+  email: foo@bar.com
+templates:
+  foo_template:
+    foo: custom
+    custom: true
+tasks:
+  foo_task:
+    foo: custom
+    custom: true
+  dont_include:

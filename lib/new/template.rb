@@ -7,7 +7,7 @@ class New::Template
   #
   CUSTOM_CONFIG_TEMPLATE = {
     license: '[LICENSE]',
-    version: '[VERSION]',
+    version: '0.0.0',
     developer: {
       name: '[NAME]',
       email: '[EMAIL]'

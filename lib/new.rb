@@ -4,7 +4,6 @@ class New
   VERSION = '0.0.1'
   DEFAULT_DIR = File.expand_path('../..', __FILE__)
   CUSTOM_DIR = File.expand_path('~/.new')
-  TEMP_DIR = File.expand_path('../../.tmp', __FILE__)
   TASKS_DIR_NAME = 'tasks'
   TEMPLATES_DIR_NAME = 'templates'
   CONFIG_FILE = '.new'
