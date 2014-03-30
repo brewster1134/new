@@ -40,7 +40,10 @@ describe New::Cli do
     end
 
     it 'should create .new file' do
-      expect(File.exists?(root('.tmp', '.new', '.new'))).to be_true
+      expect(File.exists?(root('.tmp', '.new', New::CONFIG_FILE))).to be_true
+
+      # Check that the keys are properly formatted in the yaml file
+      expect(File.read(root('.tmp', '.new', New::CONFIG_FILE))).to match /^version: 0.0.0$/
     end
 
     it 'should create an empty templates & tasks dir' do

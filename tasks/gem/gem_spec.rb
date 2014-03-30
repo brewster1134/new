@@ -91,7 +91,7 @@ describe New::Task::Gem do
     it 'should set dependencies' do
       gem_dependencies = @gem.send(:extract_gem_dependencies)
       expect(gem_dependencies).to include "  s.add_runtime_dependency 'foo', '~> 1.2.3'"
-      expect(gem_dependencies).to include "  s.add_development_dependency 'bar', '~> 0'"
+      expect(gem_dependencies).to include "  s.add_development_dependency 'bar', '>= 0'"
     end
   end
 
