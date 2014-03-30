@@ -24,6 +24,8 @@ class New::Task::Gem < New::Task
     write_gemspec
     write_config
     deploy
+
+    New.say "Version #{project_options[:version].green} of the #{project_options[:project_name].green} gem successfully published."
   end
 
 private
@@ -130,6 +132,8 @@ private
   end
 
   def write_gemspec
+    New.say 'Updating `.gemspec` file...', type: :success
+
     # process gemspec
     interpolate File.join(File.dirname(__FILE__), '.gemspec.erb'), project_options
 
@@ -141,6 +145,8 @@ private
   end
 
   def write_config
+    New.say 'Updating `.new` file...', type: :success
+
     writeable_options = project_options.dup
     writeable_options.delete(:gemspec_string)
     GLOB_ATTRIBUTES.each{ |a| writeable_options.delete(a) }
@@ -151,6 +157,9 @@ private
   end
 
   def deploy
+    New.say 'Pushing new gem version to rubygems...', type: :success
+    New.say '                ...This may take a bit', type: :warn
+
     `gem update --system`
     `gem build .gemspec`
     `gem push #{@gemspec[:name]}-#{@gemspec[:version]}.gem`

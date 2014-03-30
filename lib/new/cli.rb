@@ -34,9 +34,8 @@ class New::Cli < Thor
     if Dir.exists? New::CUSTOM_DIR
       New.say 'Home folder already exists.', type: :warn
     else
-      # create folder
+      # create folders
       New.say 'Creating home folder.', type: :success
-      FileUtils.mkdir_p New::CUSTOM_DIR
       FileUtils.mkdir_p File.join(New::CUSTOM_DIR, New::TASKS_DIR_NAME)
       FileUtils.mkdir_p File.join(New::CUSTOM_DIR, New::TEMPLATES_DIR_NAME)
 
@@ -73,6 +72,7 @@ class New::Cli < Thor
         New.say "No task '#{task}' found!", type: :fail
         next
       end
+      New.say ">>> Initializing #{task.to_s.humanize} Task...", type: :warn
       "New::Task::#{task.to_s.classify}".constantize.new project_config
     end
   end
