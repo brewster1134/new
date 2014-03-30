@@ -30,10 +30,10 @@ private
 
   def set_version
     # bump version
-    version = bump_version(project_options[:version], get_part).to_s
+    bump_version project_options[:version]
 
     # set new version to config
-    project_options[:version] = version
+    project_options[:version] = version.to_s
   end
 
   # Check that any glob pattern attributes match existing files

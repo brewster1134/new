@@ -9,15 +9,18 @@ describe New::Version do
 
   describe '#bump_version' do
     it 'should bump the major version' do
-      expect(version.bump_version('1.2.3', :major).to_s).to eq '2.0.0'
+      version.bump_version('1.2.3', :major)
+      expect(version.version.to_s).to eq '2.0.0'
     end
 
     it 'should bump the minor version' do
-      expect(version.bump_version('1.2.3', :minor).to_s).to eq '1.3.0'
+      version.bump_version('1.2.3', :minor)
+      expect(version.version.to_s).to eq '1.3.0'
     end
 
     it 'should bump the patch version' do
-      expect(version.bump_version('1.2.3', :patch).to_s).to eq '1.2.4'
+      version.bump_version('1.2.3', :patch)
+      expect(version.version.to_s).to eq '1.2.4'
     end
   end
 end

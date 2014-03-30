@@ -1,10 +1,35 @@
 module New::Version
   require 'semantic'
 
+  def part; @part; end
+  def previous_version; @previous_version; end
   def version; @version; end
 
+  def bump_version previous_version, part = nil
+    @previous_version = get_version previous_version
+    @part = part ||= get_part
+
+    # bump version
+    case part
+    when :major
+      @previous_version.major += 1
+      @previous_version.minor = 0
+      @previous_version.patch = 0
+    when :minor
+      @previous_version.minor += 1
+      @previous_version.patch = 0
+    when :patch
+      @previous_version.patch += 1
+    end
+
+    # set new version
+    @version = @previous_version
+  end
+
+private
+
   def get_part
-    New.say "            Current Version: #{version}", type: :success
+    New.say "            Current Version: #{previous_version}", type: :success
     New.say " Specify which part to bump: [#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)"
     part = STDIN.gets.chomp!
 
@@ -18,31 +43,11 @@ module New::Version
     end
   end
 
-  def bump_version current_version, part
-    get_version current_version
-
-    case part
-    when :major
-      version.major += 1
-      version.minor = 0
-      version.patch = 0
-    when :minor
-      version.minor += 1
-      version.patch = 0
-    when :patch
-      version.patch += 1
-    end
-
-    version
-  end
-
-private
-
-  def get_version string
-    @version ||= begin
-      Semantic::Version.new string
+  def get_version version
+    begin
+      Semantic::Version.new version.to_s
     rescue
-      New.say "#{string} is not a semantic version.  Use format `1.2.3`", type: :fail
+      New.say "#{version} is not a semantic version.  Use format `1.2.3`", type: :fail
       exit
     end
   end
