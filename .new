@@ -1,6 +1,5 @@
 ---
 license: MIT
-version: 0.0.11
 developer:
   name: Ryan Brewster
   email: brewster1134@gmail.com
@@ -16,5 +15,6 @@ tasks:
       bindir: bin
       test_files:
       - spec/**/*.rb
+version: 0.0.12
 project_name: new
 type: js
