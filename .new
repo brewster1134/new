@@ -15,6 +15,6 @@ tasks:
       bindir: bin
       test_files:
       - spec/**/*.rb
-version: 0.0.12
+version: 0.0.13
 project_name: new
 type: js

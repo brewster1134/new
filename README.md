@@ -117,7 +117,6 @@ end
 
 #### TODO
 * optional scripts when creating a template
-* make releasing and newing more verbose
 * write templates
 * write tasks
 
