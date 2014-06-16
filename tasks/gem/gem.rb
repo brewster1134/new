@@ -67,7 +67,7 @@ private
 
     # set defaults
     @gemspec[:date]    = Date.today.to_s
-    @gemspec[:name]    = project_options[:project_name]
+    @gemspec[:name]    = project_options[:project_name].gsub(' ', '_').underscore
     @gemspec[:version] = project_options[:version]
     @gemspec[:author]  ||= project_options[:developer][:name]
     @gemspec[:email]   ||= project_options[:developer][:email]

@@ -2,7 +2,7 @@
 Gem::Specification.new do |s|
   s.author = 'Ryan Brewster'
   s.bindir = 'bin'
-  s.date = '2014-04-01'
+  s.date = '2014-06-16'
   s.description = 'With custom templates and tasks, quickly create a new project and release it to the world.'
   s.email = 'brewster1134@gmail.com'
   s.executables = ["new"]
@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.name = 'new'
   s.summary = 'A Quick & Custom Project Creation & Release Tool'
   s.test_files = ["spec/fixtures/custom/tasks/custom_bar_task/custom_bar_task.rb", "spec/fixtures/tasks/custom_bar_task/custom_bar_task.rb", "spec/fixtures/tasks/foo_task/foo_task.rb", "spec/lib/new/cli_spec.rb", "spec/lib/new/interpolate_spec.rb", "spec/lib/new/project_spec.rb", "spec/lib/new/task_spec.rb", "spec/lib/new/template_spec.rb", "spec/lib/new/version_spec.rb", "spec/lib/new_spec.rb", "spec/spec_helper.rb"]
-  s.version = '0.0.13'
+  s.version = '0.0.14'
   s.add_runtime_dependency 'activesupport', '~> 4.0'
   s.add_runtime_dependency 'colorize', '>= 0'
   s.add_runtime_dependency 'rake', '>= 0'
