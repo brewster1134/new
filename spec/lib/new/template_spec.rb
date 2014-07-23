@@ -5,11 +5,11 @@ describe New::Template do
   let(:type){ :foo_template }
 
   before do
-    New::Template.any_instance.stub(:interpolate)
+    allow_any_instance_of(New::Template).to receive :interpolate
   end
 
   after do
-    New::Template.any_instance.unstub(:interpolate)
+    allow_any_instance_of(New::Template).to receive :interpolate
   end
 
   describe '#template_dir' do
@@ -29,7 +29,7 @@ describe New::Template do
       end
 
       it 'should set the custom flag' do
-        expect(template.instance_variable_get('@custom')).to be_true
+        expect(template.instance_variable_get('@custom')).to eq true
       end
     end
   end
@@ -43,13 +43,13 @@ describe New::Template do
       options = template.send(:options)
 
       # check default template options
-      expect(options[:default]).to be_true
+      expect(options[:default]).to eq true
 
       # check template options
-      expect(options[:template]).to be_true
+      expect(options[:template]).to eq true
 
       # check custom config options
-      expect(options[:custom]).to be_true
+      expect(options[:custom]).to eq true
 
       # check project specific options
       expect(options[:type]).to eq('foo_template')

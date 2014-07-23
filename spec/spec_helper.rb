@@ -6,13 +6,12 @@ $: << File.expand_path('tasks', New::CUSTOM_DIR)
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
-  config.treat_symbols_as_metadata_keys_with_true_values = true
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
   config.order = :random
 
   config.before do
-    New.stub(:say)
+    allow(New).to receive :say
     stub_const 'New::DEFAULT_DIR', root('spec', 'fixtures')
     stub_const 'New::CUSTOM_DIR', root('spec', 'fixtures', 'custom')
   end
@@ -34,8 +33,8 @@ end
 def new_task task, options = {}
   task_class = "New::Task::#{task.to_s.classify}".constantize
 
-  task_class.any_instance.stub(:get_part).and_return(:patch)
-  task_class.any_instance.stub(:run)
+  allow_any_instance_of(task_class).to receive(:get_part).and_return(:patch)
+  allow_any_instance_of(task_class).to receive(:run)
 
   task_hash = {}
   task_hash[task] = {}

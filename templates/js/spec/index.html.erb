@@ -1,29 +1,35 @@
 <html>
   <head>
-    <link rel="stylesheet" href="/testem/mocha.css">
-    <script src="/testem/mocha.js"></script>
-    <script src="/testem.js"></script>
-    <script src="/spec/vendor/chai.js"></script>
-    <script src="/spec/vendor/sinon.js"></script>
-    <script src="/spec/vendor/sinon-chai.js"></script>
-    <script>
-      mocha.setup('bdd');
-      mocha.setup({ignoreLeaks: true});
-      window.expect = chai.expect;
-    </script>
-
-    <!-- Scripts -->
-    <script src="/lib/<%= project_name %>.js"></script>
-
-    <!-- Specs -->
-    <script src="/.tmp/spec_helper.js"></script>
-    <script src="/.tmp/<%= project_name %>.spec.js"></script>
-
+    <link rel="stylesheet" href="/vendor/mocha/mocha.css">
+    <link rel="stylesheet" href="/lib/<%= project_name %>.css">
+    <link rel="stylesheet" href="/.tmp/<%= project_name %>_spec.css">
   </head>
+
   <body>
     <div id='mocha'></div>
-    <script>
-      mocha.run();
-    </script>
+
+    <!-- Test Fixtures -->
   </body>
+
+  <!-- Dependencies -->
+
+  <!-- Testing -->
+  <script src="/vendor/mocha/mocha.js"></script>
+  <script src="/vendor/chai/chai.js"></script>
+  <script src="/vendor/sinon/lib/sinon.js"></script>
+  <script src="/vendor/sinon/lib/sinon/call.js"></script>
+  <script src="/vendor/sinon/lib/sinon/spy.js"></script>
+  <script src="/vendor/sinon-chai/lib/sinon-chai.js"></script>
+  <script src="/testem.js"></script>
+  <script>
+    mocha.setup('bdd');
+    window.expect = chai.expect;
+  </script>
+
+  <script src="/lib/<%= project_name %>.js"></script>
+  <script src="/.tmp/<%= project_name %>_spec.js"></script>
+
+  <script>
+    mocha.run()
+  </script>
 </html>

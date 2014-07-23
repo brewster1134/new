@@ -3,10 +3,6 @@
 ## Dependencies
 *
 
-_Optional_
-
-*
-
 ## Usage
 
 #### Methods
@@ -27,35 +23,19 @@ METHOD ARGUMENT
 ## Development
 
 ### Dependencies
-* Ruby
-* Bundler Gem
-* Node.js
-* npm
-* Testem
-* PhantomJS
 
-_Optional_
-
-* Growl _\* for <= OS X Lion 10.7_
-
-### Compiling
-`bundle exec guard`
+```shell
+gem install yuyi
+yuyi https://raw.githubusercontent.com/brewster1134/tiler/master/yuyi_menu
+bundle install
+npm install
+bower install
+```
 
 Do **NOT** modify any `.js` files!  Modify the coffee files in the `src` directory.  Guard will watch for changes and compile them to the `lib` directory.
 
-### Testing
+### Compiling & Testing
 Run `testem`
-
-_- or -_
-
-Run `testem -g` if running OS X Lion or below for Growl support
 
 ## To-Do
 *
-
-## Contributing
-1. Fork it ( http://github.com/<%= tasks.github.username %>/<%= project_name %>/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request

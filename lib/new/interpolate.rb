@@ -26,6 +26,13 @@ module New::Interpolate
     @dot_options ||= RecursiveOpenStruct.new(@options)
   end
 
+  def to_filename filename
+    filename.downcase
+      .gsub(/[^\w\s_-]+/, '')
+      .gsub(/(^|\b\s)\s+($|\s?\b)/, '\\1\\2')
+      .gsub(/\s+/, '_')
+  end
+
 private
 
   # Allow templates to call option values directly

@@ -10,7 +10,7 @@ describe New::Project do
   before do
     @tmp_dir = Dir.mktmpdir
     FileUtils.cp_r root('spec', 'fixtures', 'custom', 'templates', 'custom_bar_template'), @tmp_dir
-    New::Template.stub(:new).and_return(RecursiveOpenStruct.new({ options: {}, dir: template_dir }))
+    allow(New::Template).to receive(:new).and_return(RecursiveOpenStruct.new({ options: {}, dir: template_dir }))
 
     # change directory before creating a project since it uses pwd
     Dir.chdir @tmp_dir
@@ -18,7 +18,7 @@ describe New::Project do
   end
 
   after do
-    New::Template.unstub(:new)
+    allow(New::Template).to receive(:new).and_call_original
     FileUtils.rm_rf template_dir
     FileUtils.rm_rf project_dir
   end

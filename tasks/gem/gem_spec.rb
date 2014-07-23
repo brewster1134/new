@@ -43,7 +43,7 @@ describe New::Task::Gem do
 
     it 'should replace the file_attr array of globs with an array of files' do
       files = @gem.instance_variable_get(:@gemspec)[:foo_files]
-      expect(files.all?{ |f| files.include? f }).to be_true
+      expect(files.all?{ |f| files.include? f }).to eq true
     end
   end
 
@@ -106,7 +106,7 @@ describe New::Task::Gem do
     end
 
     it 'should write a gemspec file' do
-      expect(File.exist?('.gemspec')).to be_true
+      expect(File.exist?('.gemspec')).to eq true
     end
 
     it 'should be a valid gemspec file' do

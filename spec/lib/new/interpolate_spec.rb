@@ -34,4 +34,10 @@ describe New::Interpolate do
   it 'should respond to options as methods' do
     expect(@obj.foo.bar).to eq 'baz'
   end
+
+  describe '#friendly_filename' do
+    it 'should convert a string to a unix compatible filename' do
+      expect(@obj.to_filename('Foo Bar')).to eq 'foo_bar'
+    end
+  end
 end

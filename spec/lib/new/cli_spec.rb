@@ -3,13 +3,13 @@ require 'spec_helper'
 describe New::Cli do
   describe '#projects' do
     before do
-      New.stub(:templates).and_return([:foo])
-      subject.stub(:project)
+      allow(New).to receive(:templates).and_return([:foo])
+      allow(subject).to receive(:project)
     end
 
     after do
-      New.unstub(:templates)
-      subject.unstub(:project)
+      allow(New).to receive(:templates).and_call_original
+      allow(subject).to receive(:project).and_call_original
     end
 
     it 'should accept template name as argument' do
@@ -36,19 +36,19 @@ describe New::Cli do
     end
 
     it 'should create .new dir' do
-      expect(Dir.exists?(root('.tmp', '.new'))).to be_true
+      expect(Dir.exists?(root('.tmp', '.new'))).to eq true
     end
 
     it 'should create .new file' do
-      expect(File.exists?(root('.tmp', '.new', New::CONFIG_FILE))).to be_true
+      expect(File.exists?(root('.tmp', '.new', New::CONFIG_FILE))).to eq true
 
       # Check that the keys are properly formatted in the yaml file
       expect(File.read(root('.tmp', '.new', New::CONFIG_FILE))).to match /^version: 0.0.0$/
     end
 
     it 'should create an empty templates & tasks dir' do
-      expect(Dir.exists?(root('.tmp', '.new', 'templates'))).to be_true
-      expect(Dir.exists?(root('.tmp', '.new', 'tasks'))).to be_true
+      expect(Dir.exists?(root('.tmp', '.new', 'templates'))).to eq true
+      expect(Dir.exists?(root('.tmp', '.new', 'tasks'))).to eq true
     end
   end
 
@@ -72,12 +72,12 @@ describe New::Cli do
       # test that the task is required
       describe 'require' do
         before do
-          New::Task.stub(:inherited)
+          allow(New::Task).to receive :inherited
           subject.release
         end
 
         after do
-          New::Task.unstub(:inherited)
+          allow(New::Task).to receive(:inherited).and_call_original
         end
 
         it 'should require the task' do
@@ -89,13 +89,13 @@ describe New::Cli do
       describe 'initialize' do
         before do
           require root('spec', 'fixtures', 'custom', 'tasks', 'custom_bar_task', 'custom_bar_task')
-          New::Task::CustomBarTask.stub(:new)
+          allow(New::Task::CustomBarTask).to receive :new
           stub_const 'New::CONFIG_FILE', '.new_cli_release_spec'
           subject.release
         end
 
         after do
-          New::Task::CustomBarTask.unstub(:new)
+          allow(New::Task::CustomBarTask).to receive(:new).and_call_original
         end
 
         it 'should initialize the task' do
