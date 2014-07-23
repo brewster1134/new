@@ -1,10 +1,10 @@
 test_page: spec/index.html
-before_tests: |
-  bundle exec coffee -co dist src/*.coffee
-  bundle exec coffee -co .tmp spec/*.coffee
-  bundle exec sass src/*.sass dist
-  bundle exec sass spec/*.sass .tmp
-  bundle exec sass demo/*.sass
+before_tests: bundle exec coffee -co lib src/*.coffee
+  && bundle exec coffee -co .tmp spec/*.coffee
+  && bundle exec coffee -c demo/*.coffee
+  && bundle exec sass --update src:lib
+  && bundle exec sass --update spec:.tmp
+  && bundle exec sass --update demo:demo
 src_files:
   - demo/*.sass
   - spec/*_spec.coffee
@@ -14,7 +14,7 @@ src_files:
   - src/*.sass
 serve_files:
   - .tmp/*.js
-  - dist/*.js
+  - lib/*.js
 launch_in_dev:
   - phantomjs
 launch_in_ci:

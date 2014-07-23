@@ -1,5 +1,5 @@
 sources:
-  - yuyi: https://github.com/brewster1134/Yuyi-Rolls/archive/master.zip
+  yuyi: https://github.com/brewster1134/Yuyi-Rolls/archive/master.zip
 rolls:
   bower:
   bundler:
