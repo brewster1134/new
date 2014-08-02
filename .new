@@ -3,6 +3,8 @@ license: MIT
 developer:
   name: Ryan Brewster
   email: brewster1134@gmail.com
+github:
+  username: brewster1134
 tasks:
   gem:
     gemspec:
@@ -15,6 +17,7 @@ tasks:
       bindir: bin
       test_files:
       - spec/**/*.rb
-version: 0.0.15
-project_name: new
+version: 0.1.1
+project:
+  name: new
 type: js

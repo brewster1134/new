@@ -76,7 +76,7 @@ You can also access any custom values set in your local configuration file.
 <%= developer.name %>
 <%= developer.email %>
 <%= type %>
-<%= project_name %>
+<%= project.name %>
 <%= foo %>
 <%= tasks.bar_task.baz %>
 ```

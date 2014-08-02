@@ -1,5 +1,7 @@
 license: MIT
 custom: true
+project:
+  name: Foo
 developer:
   name: Foo Bar
   email: foo@bar.com

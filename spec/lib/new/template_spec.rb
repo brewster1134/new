@@ -53,7 +53,7 @@ describe New::Template do
 
       # check project specific options
       expect(options[:type]).to eq('foo_template')
-      expect(options[:project_name]).to eq('new_template')
+      expect(options[:project][:name]).to eq('new_template')
     end
   end
 end

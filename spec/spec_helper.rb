@@ -1,7 +1,7 @@
 $: << File.expand_path('../../lib', __FILE__)
-require 'new'
 $: << File.expand_path('../../tasks', __FILE__)
 $: << File.expand_path('../fixtures', __FILE__)
+require 'new'
 $: << File.expand_path('tasks', New::CUSTOM_DIR)
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration

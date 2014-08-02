@@ -25,7 +25,7 @@ class New::Task::Gem < New::Task
     write_config
     deploy
 
-    New.say "Version #{project_options[:version].green} of the #{project_options[:project_name].green} gem successfully published."
+    New.say "Version #{project_options[:version].green} of the #{project_options[:project][:name].green} gem successfully published."
   end
 
 private
@@ -67,7 +67,7 @@ private
 
     # set defaults
     @gemspec[:date]    = Date.today.to_s
-    @gemspec[:name]    = project_options[:project_name].gsub(' ', '_').underscore
+    @gemspec[:name]    = project_options[:project][:name]
     @gemspec[:version] = project_options[:version]
     @gemspec[:author]  ||= project_options[:developer][:name]
     @gemspec[:email]   ||= project_options[:developer][:email]

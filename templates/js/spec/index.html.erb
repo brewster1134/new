@@ -1,8 +1,8 @@
 <html>
   <head>
     <link rel="stylesheet" href="/vendor/mocha/mocha.css">
-    <link rel="stylesheet" href="/lib/<%= project_name %>.css">
-    <link rel="stylesheet" href="/.tmp/<%= project_name %>_spec.css">
+    <link rel="stylesheet" href="/lib/<%= project.filename %>.css">
+    <link rel="stylesheet" href="/.tmp/<%= project.filename %>_spec.css">
   </head>
 
   <body>
@@ -26,8 +26,8 @@
     window.expect = chai.expect;
   </script>
 
-  <script src="/lib/<%= project_name %>.js"></script>
-  <script src="/.tmp/<%= project_name %>_spec.js"></script>
+  <script src="/lib/<%= project.filename %>.js"></script>
+  <script src="/.tmp/<%= project.filename %>_spec.js"></script>
 
   <script>
     mocha.run()

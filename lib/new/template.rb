@@ -29,8 +29,10 @@ class New::Template
       .deep_merge!(template_config)
       .deep_merge!(New.custom_config)
       .deep_merge!({
-        project_name: @name,
-        project_filename: to_filename(@name),
+        project: {
+          name: @name,
+          filename: to_filename(@name)
+        },
         type: @type.to_s
       })
   end

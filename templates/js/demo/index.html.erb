@@ -1,12 +1,12 @@
 <html>
   <head>
-    <title><%= project_name %></title>
-    <link type="text/css" rel="stylesheet" media="all" href="../dist/<%= project_filename %>.css"/>
-    <link type="text/css" rel="stylesheet" media="all" href="<%= project_filename %>_demo.css"/>
+    <title><%= project.name %></title>
+    <link type="text/css" rel="stylesheet" media="all" href="../lib/<%= project.filename %>.css"/>
+    <link type="text/css" rel="stylesheet" media="all" href="<%= project.filename %>_demo.css"/>
   </head>
   <body>
   </body>
 
-  <script type="text/javascript" src="../lib/<%= project_filename %>.js"></script>
-  <script type="text/javascript" src="<%= project_filename %>_demo.js"></script>
+  <script type="text/javascript" src="../lib/<%= project.filename %>.js"></script>
+  <script type="text/javascript" src="<%= project.filename %>_demo.js"></script>
 </html>

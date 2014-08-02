@@ -13,7 +13,6 @@ describe New::Task::Gem do
   end
 
   after do
-    New::Task::Gem.any_instance.unstub(:run)
     Dir.chdir @pwd
   end
 
@@ -49,13 +48,13 @@ describe New::Task::Gem do
 
   describe '#render_gemspec_options' do
     before do
-      @gem.stub(:extract_gem_dependencies).and_return(['  s.extract_gem_dependencies'])
+      allow(@gem).to receive(:extract_gem_dependencies).and_return(['  s.extract_gem_dependencies'])
       @gem.instance_variable_set(:@gemspec, {})
       @gem.send(:render_gemspec_options)
     end
 
     after do
-      @gem.unstub(:extract_gem_dependencies)
+      allow(@gem).to receive(:extract_gem_dependencies).and_call_original
     end
 
     it 'should create the gemspec_string option' do
@@ -97,12 +96,12 @@ describe New::Task::Gem do
 
   describe '#write_gemspec' do
     before do
-      @gem.stub(:project_options).and_return({ gemspec_string: 'foo' })
+      allow(@gem).to receive(:project_options).and_return({ gemspec_string: 'foo' })
       @gem.send(:write_gemspec)
     end
 
     after do
-      @gem.unstub(:project_options)
+      allow(@gem).to receive(:project_options).and_call_original
     end
 
     it 'should write a gemspec file' do
@@ -118,7 +117,7 @@ describe New::Task::Gem do
 
   describe '#write_config' do
     before do
-      @gem.stub(:project_options).and_return({
+      allow(@gem).to receive(:project_options).and_return({
         gemspec_string: 'foo',
         foo_files: 'foo',
         bar: 'bar'
@@ -127,7 +126,7 @@ describe New::Task::Gem do
     end
 
     after do
-      @gem.unstub(:project_options)
+      allow(@gem).to receive(:project_options).and_call_original
     end
 
     it 'should update the config file' do
