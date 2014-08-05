@@ -1,67 +1,49 @@
-require 'yaml'
-
 class New::Template
   include New::Interpolate
 
-  # The foundation for new template configuration files
-  #
-  CUSTOM_CONFIG_TEMPLATE = {
-    license: '[LICENSE]',
-    version: '0.0.0',
-    developer: {
-      name: '[NAME]',
-      email: '[EMAIL]'
-    }
-  }
+  def initialize template_name, project
+    @template_name = template_name
+    @template_dir = find_template
+    @project = project
+    @options = get_options
 
-  def initialize type, name
-    @type = type
-    @name = name
-
-    interpolate template_dir, options
+    interpolate @template_dir, @options
   end
 
-  # Create the options object
-  #
-  def options
-    # merge options together
-    CUSTOM_CONFIG_TEMPLATE.clone
-      .deep_merge!(template_config)
-      .deep_merge!(New.custom_config)
-      .deep_merge!({
-        project: {
-          name: @name,
-          filename: to_filename(@name)
-        },
-        type: @type.to_s
-      })
-  end
+  def options; @options; end
 
 private
 
-  # Get the template directory to copy from
+  # Create the options object
   #
-  def template_dir
-    @template_dir ||= if New.custom_templates.include? @type
-      @custom = true
-      File.join(New::CUSTOM_DIR, New::TEMPLATES_DIR_NAME, @type.to_s)
-    else
-      File.join(New::DEFAULT_DIR, New::TEMPLATES_DIR_NAME, @type.to_s)
-    end
+  def get_options
+    global_options = New.global_config
+    global_template_options = global_options.delete(:templates)[@template_name] || {}
+
+    global_options
+      .deep_merge({
+        template: template_options.deep_merge(global_template_options),
+        project: {
+          name: @project.name,
+          filename: @project.filename
+        }
+      })
+    .deep_symbolize_keys
+  end
+
+  # Get the template directory to copy from
+  # TODO: source all templates
+  #
+  def find_template
+    ''
   end
 
   # Get the configuration for the template
   #
-  def template_config
-    return @template_config if @template_config
-
-    @template_config = YAML.load(File.open(File.join(template_dir, New::CONFIG_FILE))).deep_symbolize_keys! rescue {}
-    if @custom
-      @template_config.merge!({
-        custom: true
-      })
-    end
-
-    @template_config
+  def template_options
+    file_options = YAML.load(File.open(File.join(@template_dir, New::CONFIG_FILE))) rescue {}
+    file_options.merge({
+      name: @template_name.to_s
+    })
   end
 end

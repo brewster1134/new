@@ -1,4 +1,0 @@
-tasks:
-  foo_task:
-    foo: project
-    project: true

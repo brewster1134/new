@@ -1,76 +1,73 @@
 # new
-###### install
+**_NEW_ is a tool to very quickly create new projects in any language, and deploy new semantic versions of them with any tools you desire.**
+
+  Dependencies
+* Ruby >= 1.9.3
+
+  Templates
+_NEW_ templates are simply directories & files in a structure for your desired project.
+
+Templates allow quick boilerplating & post-processing scaffolding, and supports interpolating the contents of a file and the file/directory names themselves.
+
+* A `[FOO]_template.rb` file must be included in the root of the template
+* `[FOO]_template.rb` file must contain a class of `New::FooTemplate` and inherit from `New::Template`
+* `[FOO]_template.rb` file must have a `run` method defined
+
+  Tasks
+_NEW_ tasks are ruby scripts that help you create new semantic versions of your project and deploy it any way you like.
+
+* A `foo_task.rb` file must be included in the template directory
+* The `.rb` file must contain a class of `New::FooTask` and inherit from `New::Task`
+* The `.rb` file must have a `run` method defined
+
+```ruby
+# ~/.new/tasks/foo_task/foo_task.rb
+
+class New::FooTask < New::Task
+  # required `run` method
+  def run
+    # do task stuff here
+
+    # access task options from the `options` object
+    # access all project options from the `project_options` object
+  end
+end
+```
+
+#### Install
 ```shell
 gem install new
 new init
 ```
 
-###### Create a new project
+### Usage
+  Create a new project
 ```shell
 new [TEMPLATE] [NAME]
 ```
 
-###### Release a new version
+  Release a new version
 ```shell
 new release
 ```
 
-#### Templates
-Templates represent a boilerplate directory & file structure preconfigured for a given project type. _(eg js, ruby, gem, rails, etc.)_
+### Development
+  Dependencies
 
-#### Tasks
-Tasks represent a process associated with releasing new code.  Tasks are run in order they are listed in the project `.new` configuration file.
-
-#### Local Config/Templates/Tasks
-After running `new init`, you will have `.new` folder in your home directory.  This directory contains:
-
-* `.new` local configuration file
-* `tasks` directory for custom tasks
-* `templates` directory for custom templates
-
-Copy or create custom templates & tasks in these folders.  They will take precendence over the default templates included with the gem.
-
-**Make sure to edit your local configuration file!**
-
-```yaml
-# ~/.new/.new
-
-license: MIT
-developer:
-  name: Foo Bar
-  email: foo@bar.com
-templates:
-  foo_template:
-    custom: option
-tasks:
-  github:
-    username: foouser
+```shell
+gem install yuyi
+yuyi -m https://raw.githubusercontent.com/brewster1134/new/master/yuyi_menu
+bundle install
 ```
 
-
-#### Custom Templates
-* The directory name will be used for the template name.
-* Templates can have a `.new` file in the root of the folder.  These values can be accessed through interpolation.
-
-```yaml
-# ~/.new/templates/foo_template/.new
-
-foo: bar
-tasks:
-  foo_task:
-  bar_task:
-    baz: 'baz'
-```
-
-_Note: the tasks are followed by a colon `:` whether they have options or not._
-
-###### Interpolation
-Use ERB template syntax in your files to interpolate template options.  Make sure to add `.erb` to the end of the filename.
-
-You can also access any custom values set in your local configuration file.
+  Interpolation
+* Add `.erb` extension to any file needing its content interpolated
+* Interpolate file/directory names using the syntax `foo_[PROJECT.NAME].txt`
+* Use dot notation to access nested values
+* Access any values from the `.new` configuration file in your home directory, as well as any values from the `.new` configuration file in root of your project directory
 
 ```erb
-<%# ~/.new/templates/foo_template/foo.txt.erb %>
+<%# ~/.new/templates/foo_template/foo_[PROJECT.NAME].txt.erb %>
 
 <%= license %>
 <%= developer.name %>
@@ -81,48 +78,5 @@ You can also access any custom values set in your local configuration file.
 <%= tasks.bar_task.baz %>
 ```
 
-You can also interpolate directory and filenames using the syntax `foo_[DEVELOPER.NAME].txt`
-
-_Note using the dot notation to access nested attributes._
-
-#### Custom Tasks
-* The directory name will be used for the task name
-* A `.rb` file must be included in the directory with the same name
-* The `.rb` file must contain a class of `New::Task::FooTask` and inherit from `New::Task`
-* The `.rb` file must have a standard ruby `run` method that will run when a project is released.
-* A Task can have an `OPTIONS` constant with default options needed for the task to run.  These can be further customized in the project or local configuration `.new` file
-
-```ruby
-# ~/.new/tasks/foo_task/foo_task.rb
-
-class New::Task::FooTask < New::Test
-  include New::Interpolate  # if you need to interpolate files
-  include New::version      # if you need to set & manage a semantic version
-
-  # defaults for required options
-  OPTION = {
-    foo: 'bar'
-  }
-
-  # required `run` method
-  def run
-    # do task stuff here
-
-    access
-    # access task options from the `options` object
-    # access all project options from the `project_options` object
-  end
-end
-```
-
-#### TODO
-* optional scripts when creating a template
-* write templates
-* write tasks
-
-#### Contributing
-1. Fork it ( http://github.com/brewster1134/new/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+  Compiling & Testing
+Run `bundle exec guard`

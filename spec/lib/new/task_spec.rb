@@ -1,39 +1,41 @@
 require 'spec_helper'
 require 'yaml'
 
-class New::Task::TaskSpec < New::Task
-  OPTIONS = {
-    default: true
-  }
-  def run; end
+class New::TaskSpec < New::Task
+  OPTIONS = { task_spec: false }
 end
 
 describe New::Task do
-  let(:task){ New::Task::TaskSpec.new YAML.load(File.open(root('spec', 'fixtures', 'project', '.new'))).deep_symbolize_keys! }
+  before do
+    allow(New).to receive(:global_config).and_return({ global_options: true })
+    allow_any_instance_of(New::TaskSpec).to receive(:run)
 
-  describe '.inherited' do
-    it 'should create a name from the class name' do
-      expect(task.class.name).to eq :task_spec
-    end
+    @task = New::TaskSpec.new({
+      project_options: true,
+      tasks: {
+        task_options: true,
+        foo_options: false
+      }
+    })
   end
 
-  describe 'instances' do
-    before do
-      allow(task).to receive(:name).and_return(:foo_task)
-    end
+  after do
+    allow(New).to receive(:global_config).and_call_original
+  end
 
-    after do
-      allow(task).to receive(:name).and_call_original
-    end
+  it 'should get the correct project options' do
+    expect(@task.project.options).to eq({
+      global_options: true,
+      project_options: true,
+      task_spec: { task_options: true }
+    })
+  end
 
-    it 'should not merge other tasks in' do
-      # make sure the custom config has the extra task, and make sure it doesnt come through to the task
-      expect(YAML.load(File.open(root('spec', 'fixtures', 'custom', New::CONFIG_FILE))).deep_symbolize_keys![:tasks].has_key?(:dont_include)).to eq true
-      expect(task.project_options[:tasks].has_key?(:dont_include)).to eq false
-    end
+  it 'should get the correct task options' do
+    expect(@task.options).to eq({ task_options: true })
+  end
 
-    it 'should get the correct task options' do
-      expect(task.options).to eq({ foo: 'project', project: true, custom: true, default: true })
-    end
+  it 'should call the run method' do
+    expect(@task).to have_received(:run)
   end
 end
