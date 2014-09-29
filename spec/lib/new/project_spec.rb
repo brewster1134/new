@@ -4,9 +4,7 @@ require 'recursive-open-struct'
 describe New::Project do
 
   before do
-    # set pwd to a temp folder to create the new project in
-    @original_dir = Dir.pwd
-    Dir.chdir Dir.mktmpdir
+    allow(Dir).to receive(:pwd).and_return(Dir.mktmpdir)
 
     allow(New).to receive(:global_options).and_return({
       global_options: true
@@ -23,7 +21,8 @@ describe New::Project do
   end
 
   after do
-    Dir.chdir @original_dir
+    allow(Dir).to receive(:pwd).and_call_original
+    allow(New).to receive(:global_options).and_call_original
     allow(New::Template).to receive(:new).and_call_original
   end
 

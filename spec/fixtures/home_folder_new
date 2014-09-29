@@ -1,10 +1,7 @@
 ---
+sources:
+  local: ~/Code/ruby/new-source
+  new: https://github.com/brewster1134/new-source
 developer:
   name: Foo Bar
   email: foobar@email.com
-task_sources:
-  - custom/tasks
-  - tasks
-template_sources:
-  - custom/templates
-  - templates

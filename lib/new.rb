@@ -15,6 +15,7 @@ require 'new/version'
 # classes
 require 'new/cli'
 require 'new/project'
+require 'new/source'
 require 'new/template'
 require 'new/task'
 
@@ -27,13 +28,7 @@ class New
   end
 
   def self.version
-    YAML.load(File.read(File.dirname(__FILE__) + '/../.new'))['version']
-  end
-
-  def self.tasks
-  end
-
-  def self.templates
+    YAML.load(File.read(File.dirname(__FILE__) + "/../#{CONFIG_FILE}"))['version']
   end
 end
 
