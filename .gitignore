@@ -1,6 +1,6 @@
-.DS_Store
-.bundle
-.tmp
-pkg
-tmp
 *.gem
+.DS_Store
+.ruby-version
+.yardoc
+coverage
+tmp

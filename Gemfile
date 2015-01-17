@@ -1,16 +1,15 @@
 source 'https://rubygems.org'
 
-gem 'activesupport', '~> 4.0'
-gem 'colorize'
-gem 'rake'
-gem 'recursive-open-struct'
-gem 'semantic'
-gem 'thor'
+gem 'cli_miami', '~> 0.0'
+gem 'colorize', '~> 0.7'
+gem 'sourcerer_', '~> 0.0', :require => 'sourcerer'
+gem 'thor', '~> 0.19'
 
-group :development do
-  gem 'guard'
-  gem 'guard-bundler'
-  gem 'guard-rspec'
-  gem 'rspec'
-  gem 'terminal-notifier-guard'
+group :test do
+  gem 'coveralls', '~> 0.7', :require => false
+  gem 'guard', '~> 2.6'
+  gem 'guard-bundler', '~> 2.1'
+  gem 'guard-rspec', '~> 4.3', :require => false
+  gem 'rspec', '~> 3.1'
+  gem 'terminal-notifier-guard', '~> 1.5'
 end

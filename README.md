@@ -1,82 +1,77 @@
-# new
-**_NEW_ is a tool to very quickly create new projects in any language, and deploy new semantic versions of them with any tools you desire.**
+[![Gem Version](https://badge.fury.io/rb/new.svg)](http://badge.fury.io/rb/new)
+[![Build Status](https://travis-ci.org/brewster1134/new.svg?branch=master)](https://travis-ci.org/brewster1134/new)
+[![Coverage Status](https://coveralls.io/repos/brewster1134/new/badge.png)](https://coveralls.io/r/brewster1134/new)
+[![WTFPL](http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-4.png)](http://www.wtfpl.net)
 
-  Dependencies
-* Ruby >= 1.9.3
+# NEW
+A flexible tool for releasing your code into the wild.
 
-  Templates
-_NEW_ templates are simply directories & files in a structure for your desired project.
+### Dependencies
+*
 
-Templates allow quick boilerplating & post-processing scaffolding, and supports interpolating the contents of a file and the file/directory names themselves.
+---
+## Markup
+> HTML
 
-* A `[FOO]_template.rb` file must be included in the root of the template
-* `[FOO]_template.rb` file must contain a class of `New::FooTemplate` and inherit from `New::Template`
-* `[FOO]_template.rb` file must have a `run` method defined
-
-  Tasks
-_NEW_ tasks are ruby scripts that help you create new semantic versions of your project and deploy it any way you like.
-
-* A `foo_task.rb` file must be included in the template directory
-* The `.rb` file must contain a class of `New::FooTask` and inherit from `New::Task`
-* The `.rb` file must have a `run` method defined
-
-```ruby
-# ~/.new/tasks/foo_task/foo_task.rb
-
-class New::FooTask < New::Task
-  # required `run` method
-  def run
-    # do task stuff here
-
-    # access task options from the `options` object
-    # access all project options from the `project_options` object
-  end
-end
+>```html
+<div>
+</div>
 ```
 
-#### Install
-```shell
-gem install new
-new init
+> CSS
+>```sass
+.<>name.file<>
 ```
 
-### Usage
-  Create a new project
-```shell
-new [TEMPLATE] [NAME]
+> JS
+>```coffee
+->
 ```
 
-  Release a new version
-```shell
-new release
+---
+## Methods
+> **name** _description_
+
+> _Arguments_
+>```yaml
+arg: [Type] description
+  default:
 ```
 
-### Development
-  Dependencies
+> _Usage_
+>```coffee
+->
+```
+
+---
+## Events
+> **name** _description_
+
+> _Arguments_
+>```yaml
+arg: [Type] description
+  default:
+```
+
+> _Usage_
+>```coffee
+->
+```
+
+## Development
+### Dependencies
 
 ```shell
 gem install yuyi
-yuyi -m https://raw.githubusercontent.com/brewster1134/new/master/yuyi_menu
+yuyi -m https://raw.githubusercontent.com/<>github.username<>/<>name.file<>/master/Yuyifile
 bundle install
+npm install
+bower install
 ```
 
-  Interpolation
-* Add `.erb` extension to any file needing its content interpolated
-* Interpolate file/directory names using the syntax `foo_[PROJECT.NAME].txt`
-* Use dot notation to access nested values
-* Access any values from the `.new` configuration file in your home directory, as well as any values from the `.new` configuration file in root of your project directory
+>Do **NOT** modify any `.js` files!  Modify the `src` files and Testem will watch for changes and compile them to the correct directory.
 
-```erb
-<%# ~/.new/templates/foo_template/foo_[PROJECT.NAME].txt.erb %>
-
-<%= license %>
-<%= developer.name %>
-<%= developer.email %>
-<%= type %>
-<%= project.name %>
-<%= foo %>
-<%= tasks.bar_task.baz %>
+### Compiling & Testing
+```shell
+testem
 ```
-
-  Compiling & Testing
-Run `bundle exec guard`

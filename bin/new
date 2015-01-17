@@ -1,6 +1,4 @@
 #!/usr/bin/env ruby
 $: << File.dirname(__FILE__) + '/../lib'
-
 require 'new'
-
 New::Cli.start ARGV

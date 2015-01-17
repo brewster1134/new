@@ -1,3 +1,0 @@
-class New::Source
-
-end

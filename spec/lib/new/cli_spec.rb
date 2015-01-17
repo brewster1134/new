@@ -1,82 +1,53 @@
-require 'spec_helper'
+require 'active_support/core_ext/hash/keys'
 
 describe New::Cli do
   before do
+    allow(New).to receive(:new)
+
+    # run all cli commands from the project fixture directory
+    @pwd = FileUtils.pwd
+    FileUtils.chdir root('spec', 'fixtures', 'project')
+
+    # set the home directory to tmp
+    stub_const 'New::HOME_DIRECTORY', root('tmp')
+
+    # initialize cli instance
     @cli = New::Cli.new
   end
 
-  describe '#templates' do
-    it 'should list available templates' do
-      expect(@cli.templates).to match_array [:foo_template]
-    end
+  after do
+    allow(New).to receive(:new).and_call_original
+
+    # change back to root for the rest of the tests
+    FileUtils.chdir @pwd
   end
 
   describe '#init' do
-    before do
-      @tmp_dir = Dir.mktmpdir
-      stub_const 'New::GLOBAL_CONFIG_FILE', File.join(@tmp_dir, New::CONFIG_FILE)
-
+    it 'should create a default Newfile' do
       @cli.init
-    end
+      newfile_object = YAML.load(File.read(File.join(New::HOME_DIRECTORY, New::NEWFILE_NAME))).symbolize_keys
 
-    it 'should create a .new configuration file' do
-      expect(File.exists(New::GLOBAL_CONFIG_FILE)).to be true
+      expect(newfile_object[:tasks]).to be_a Hash
     end
   end
 
-  describe '#project' do
-    before do
-      @pwd = Dir.pwd
-      @tmp_dir = Dir.mktmpdir
-
-      Dir.chdir @tmp_dir
-
-      @cli.project 'foo_template', 'foo_project'
-    end
-
-    after do
-      Dir.chdir @pwd
-    end
-
-    it 'should create a new directory for the project' do
-      expect(File.exists(File.join(@tmp_dir, New::CONFIG_FILE))).to be true
-    end
-
-    it 'should create interpolated assets' do
-      expect(File.exists(File.join(@tmp_dir, 'baz.txt'))).to be true
-      expect(File.read(File.join(@tmp_dir, 'baz.txt'))).to include 'foo baz'
+  describe '#tasks' do
+    it 'should list all available tasks' do
+      expect{ @cli.tasks }.to output(/local_task/, /remote_task/).to_stdout
     end
   end
 
   describe '#release' do
-    before do
-      require 'spec/fixtures/foo_task/foo_task'
-      allow(New::FooTask).to receive(:run)
-
-      @pwd = Dir.pwd
-      Dir.chdir root('spec', 'fixtures', 'foo_project')
+    it 'should initialize' do
       @cli.release
-    end
 
-    after do
-      allow(New::FooTask).to receive(:run).and_call_original
-      Dir.chdir @pwd
-    end
-
-    it 'should call run for the listed tasks' do
-      expect(New::FooTask).to receive(:run)
+      expect(New).to have_received(:new)
     end
   end
 
   describe '#version' do
-    before do
-      @pwd = Dir.pwd
-      Dir.chdir root('spec', 'fixtures', 'foo_project')
-    end
-
-
-    it 'should return the current version of the new gem' do
-      expect(@cli.version.to_s).to eq '1.2.3'
+    it 'should return the current version' do
+      expect{ @cli.tasks }.to output('1.2.3').to_stdout
     end
   end
 end

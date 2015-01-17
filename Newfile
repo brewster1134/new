@@ -18,4 +18,4 @@ project:
   name: new
   description: 'A Quick & Custom Project Creation & Release Tool'
   homepage: https://github.com/brewster1134/new
-type: js
+type: ruby
