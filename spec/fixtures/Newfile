@@ -1,0 +1,4 @@
+# home Newfile fixture
+sources:
+  home_local: /home_local/source
+  home_remote: home_remote/source

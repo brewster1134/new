@@ -19,6 +19,24 @@ class New::Cli < Thor
 
   desc 'tasks', 'List all available tasks'
   def tasks
+    S.ay 'Fetching sources...', :success
+
+    New.load_newfiles
+    New::Source.load_sources
+
+    New::Source.sources.each do |source_name, source|
+      S.ay source_name.to_s, :newline => false, :style => [:bold, :underline]
+      S.ay ' => ', :newline => false
+      S.ay source.path, :color => :blue
+
+      source.tasks.keys.each do |task_name|
+        S.ay task_name, :newline => false, :indent => source_name.to_s.length + 1, :color => :green
+        S.ay ' => ', :newline => false
+        S.ay "#{source_name}##{task_name}", :color => :blue, :style => :bright
+      end
+
+      S.ay
+    end
   end
 
   desc 'release', 'Release a new version of your project'

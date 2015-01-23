@@ -1,13 +1,20 @@
+require 'active_support/core_ext/hash/deep_merge'
+require 'yaml'
+
 class New
   require 'new/cli'
+  require 'new/source'
+  require 'new/task'
 
-  HOME_DIRECTORY = File.expand_path '~'
+  HOME_DIRECTORY = ENV['HOME']
   NEWFILE_NAME = 'Newfile'
   DEFAULT_NEWFILE = {
-    :version => '0.0.0',
-    :sources => {},
-    :tasks => {},
+    :sources => {
+      :default => 'brewster1134/new-tasks'
+    }
   }
+
+  @@new_object = DEFAULT_NEWFILE.dup
 
   # CLI Miami presets
   CliMiami.set_preset :fail, {
@@ -19,39 +26,38 @@ class New
   CliMiami.set_preset :success, {
     :color => :green
   }
+
+  # load all Newfiles
+  #
+  def self.load_newfiles
+    New.load_newfile File.join(New::HOME_DIRECTORY, New::NEWFILE_NAME)
+    New.load_newfile File.join(Dir.pwd, New::NEWFILE_NAME)
+  end
+
+  def self.load_newfile newfile_path
+    # check file exists
+    return false unless File.file? newfile_path
+
+    # load Newfile yaml into global new_object hash
+    self.new_object = YAML.load File.read newfile_path
+  end
+
+private
+
+    def self.new_object; @@new_object; end
+
+    # allows helper accessors for new_object
+    #
+    def self.method_missing method
+      value = self.new_object[method]
+      defined?(value) ? value : super
+    end
+
+    def self.new_object= hash
+      @@new_object.deep_merge! hash.deep_symbolize_keys
+    end
 end
 
-
-# require 'active_support/core_ext/hash/keys'
-# require 'active_support/core_ext/object/deep_dup'
-# require 'active_support/core_ext/string/inflections'
-# require 'semantic'
-# require 'yaml'
-
-# class New; end
-# # modules
-# require 'new/dsl'
-# require 'new/version'
-
-# # classes
-# require 'new/cli'
-# require 'new/project'
-# require 'new/source'
-# require 'new/template'
-# require 'new/task'
-
-# class New
-#   CONFIG_FILE = '.new'
-#   GLOBAL_CONFIG_FILE = File.expand_path("~/#{CONFIG_FILE}")
-
-#   def self.global_config
-#     YAML.load(File.read(GLOBAL_CONFIG_FILE)).deep_symbolize_keys
-#   end
-
-#   def self.version
-#     @version ||= Semantic::Version.new YAML.load(File.read(File.dirname(__FILE__) + "/../#{CONFIG_FILE}"))['version']
-#   end
-# end
 
 
 private
