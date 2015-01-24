@@ -2,16 +2,15 @@ require 'sourcerer'
 
 class New::Source
   @@sources = {}
-
   def self.sources; @@sources; end
 
+  # loop through sources saved to the global new object and initializes sources from them
+  #
   def self.load_sources
     New.sources.each do |name, path|
       @@sources[name] = New::Source.new(path)
     end
   end
-
-  attr_reader :path, :tasks
 
 private
 

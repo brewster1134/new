@@ -16,24 +16,17 @@ class New
 
   @@new_object = DEFAULT_NEWFILE.dup
 
-  # CLI Miami presets
-  CliMiami.set_preset :fail, {
-    :color => :red
-  }
-  CliMiami.set_preset :warn, {
-    :color => :yellow
-  }
-  CliMiami.set_preset :success, {
-    :color => :green
-  }
-
-  # load all Newfiles
+  # load Newfiles in home directory and pwd
   #
   def self.load_newfiles
-    New.load_newfile File.join(New::HOME_DIRECTORY, New::NEWFILE_NAME)
-    New.load_newfile File.join(Dir.pwd, New::NEWFILE_NAME)
+    self.load_newfile File.join(New::HOME_DIRECTORY, New::NEWFILE_NAME)
+    self.load_newfile File.join(Dir.pwd, New::NEWFILE_NAME)
   end
 
+  # load newfile contents into the global new object
+  # @param newfile_path [String] path to a valid Newfile
+  # @return [Hash] hash of newfile yaml contents
+  #
   def self.load_newfile newfile_path
     # check file exists
     return false unless File.file? newfile_path
@@ -42,38 +35,34 @@ class New
     self.new_object = YAML.load File.read newfile_path
   end
 
-private
+  # merge symbolized hash data into global new object
+  # @param hash [Hash] any hash to be merged into existing data
+  # @return [Hash] new merged data
+  #
+  def self.new_object= hash
+    @@new_object.deep_merge! hash.deep_symbolize_keys
+  end
 
-    def self.new_object; @@new_object; end
-
-    # allows helper accessors for new_object
-    #
-    def self.method_missing method
-      value = self.new_object[method]
-      defined?(value) ? value : super
-    end
-
-    def self.new_object= hash
-      @@new_object.deep_merge! hash.deep_symbolize_keys
-    end
+  # allows helper accessors to look in new_object
+  #
+  def self.method_missing method
+    value = @@new_object[method]
+    defined?(value) ? value : super
+  end
 end
 
-
-
-private
-
-    # Get a user input value for which semantic version part to bump
-    #
-    def get_part
-      S.ay "            Current Version: #{New.version}", type: :success
-      A.sk " Specify which part to bump: [#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)" do |part|
-        case part
-        when 'M'
-          :major
-        when 'm'
-          :minor
-        when 'p'
-          :patch
-        end
-      end
+# Get a user input value for which semantic version part to bump
+#
+def get_part
+  S.ay "            Current Version: #{New.version}", type: :success
+  A.sk " Specify which part to bump: [#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)" do |part|
+    case part
+    when 'M'
+      :major
+    when 'm'
+      :minor
+    when 'p'
+      :patch
     end
+  end
+end
