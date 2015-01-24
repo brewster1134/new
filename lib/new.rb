@@ -15,6 +15,7 @@ class New
   }
 
   @@new_object = DEFAULT_NEWFILE.dup
+  def self.new_object; @@new_object; end
 
   # load Newfiles in home directory and pwd
   #

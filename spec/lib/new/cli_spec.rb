@@ -93,9 +93,25 @@ describe New::Cli do
     end
   end
 
-  describe.skip '#version' do
+  describe '#version' do
+    before do
+      allow(New).to receive(:load_newfiles)
+
+      New.class_var :new_object, {
+        :name => 'Project Name',
+        :version => '1.2.3'
+      }
+    end
+
+    after do
+      allow(New).to receive(:load_newfiles).and_call_original
+    end
+
     it 'should return the current version' do
-      expect{ @cli.tasks }.to output('1.2.3').to_stdout
+      @cli.version
+
+      expect(S).to have_received(:ay).with 'Project Name', anything
+      expect(S).to have_received(:ay).with '1.2.3', anything
     end
   end
 end

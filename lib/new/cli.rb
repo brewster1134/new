@@ -41,10 +41,14 @@ class New::Cli < Thor
 
   desc 'release', 'Release a new version of your project'
   def release
+    New.new
   end
 
   desc 'version', 'Show the current version'
   def version
+    New.load_newfiles
+    S.ay New.new_object[:name], :newline => false
+    S.ay New.new_object[:version], :color => :green, :indent => 1
   end
 
   default_task :release
