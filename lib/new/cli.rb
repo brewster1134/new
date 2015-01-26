@@ -30,9 +30,7 @@ class New::Cli < Thor
       S.ay source.path, :color => :blue
 
       source.tasks.keys.each do |task_name|
-        S.ay task_name, :newline => false, :indent => source_name.to_s.length + 1, :color => :green
-        S.ay ' => ', :newline => false
-        S.ay "#{source_name}##{task_name}", :color => :blue, :style => :bright
+        S.ay task_name.to_s, :indent => 2, :color => :green
       end
 
       S.ay

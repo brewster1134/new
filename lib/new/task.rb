@@ -1,26 +1,17 @@
 class New::Task
   @@tasks = {}
+  def self.tasks; @@tasks; end
 
-  # when custom task is required to the global task hash to initialize later
+  # when custom task is required, add the class to the global hash to initialize later
   #
   def self.inherited subclass
-    name = subclass.to_s.downcase.to_sym
-    New::Task.add_task name, subclass
+    # create name from task file name
+    # e.g. foo_task.rb => `foo`
+    task_name = caller.first.match(/([^\/]*)_task\.rb.*$/)[1].to_sym
+    @@tasks[task_name] = subclass
   end
 
-  # add task to global hash
-  # @param name [String] task name taken from task directory
-  # @param task [Task] new task class
-  #
-  def self.add_task name, task
-    @@tasks[name.to_sym] = task
+  def self.load task_path
+    require task_path.sub(/\.rb$/, '')
   end
-
-private
-
-    # require task and have it added to the global hash
-    #
-    def initialize path
-      require path.sub(/\.rb$/, '')
-    end
 end

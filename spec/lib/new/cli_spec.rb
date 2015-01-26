@@ -73,16 +73,16 @@ describe New::Cli do
     it 'should list all available tasks' do
       expect(S).to have_received(:ay).with('source_name', anything).ordered
       expect(S).to have_received(:ay).with(including('/source'), anything).ordered
-      expect(S).to have_received(:ay).with(including('source_name#task_name'), anything).ordered
+      expect(S).to have_received(:ay).with('task_name', anything).ordered
     end
   end
 
-  describe.skip '#release' do
+  describe '#release' do
     before do
       allow(New).to receive(:new)
     end
 
-    before do
+    after do
       allow(New).to receive(:new).and_call_original
     end
 

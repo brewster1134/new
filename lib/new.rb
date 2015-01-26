@@ -50,6 +50,24 @@ class New
     value = @@new_object[method]
     defined?(value) ? value : super
   end
+
+private
+
+    def initialize
+      New.load_newfiles
+      New::Source.load_sources
+
+      # find and load all task files
+      New.tasks.each do |task_name, task_options|
+        task_path = New::Source.find_task_path task_name, task_options.delete(:source)
+        New::Task.load task_path
+      end
+
+      # run all tasks
+      New.tasks.each do |task_name, task_options|
+        New::Task.tasks[task_name].new task_options
+      end
+    end
 end
 
 # Get a user input value for which semantic version part to bump

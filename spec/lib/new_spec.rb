@@ -58,4 +58,61 @@ describe New do
       })
     end
   end
+
+  describe '#initialize' do
+    before do
+      class FooTask
+        def initialize options; end
+      end
+      class BarTask
+        def initialize options; end
+      end
+      allow(FooTask).to receive(:new)
+      allow(BarTask).to receive(:new)
+      allow(New).to receive(:load_newfiles)
+      allow(New::Source).to receive(:load_sources)
+      allow(New::Source).to receive(:find_task_path)
+      allow(New::Task).to receive(:load)
+
+      New.class_var :new_object, {
+        :tasks => {
+          :foo_task => {
+            :foo_option => true
+          },
+          :bar_task => {
+            :source => :bar_source,
+            :bar_option => true
+          }
+        }
+      }
+
+      New::Task.class_var :tasks, {
+        :foo_task => FooTask,
+        :bar_task => BarTask
+      }
+
+      New.new
+    end
+
+    after do
+      allow(New).to receive(:load_newfiles).and_call_original
+      allow(New::Source).to receive(:load_sources).and_call_original
+      allow(New::Source).to receive(:find_task_path).and_call_original
+      allow(New::Task).to receive(:load).and_call_original
+    end
+
+    it 'should search for tasks' do
+      expect(New::Source).to have_received(:find_task_path).with(:foo_task, nil).ordered
+      expect(New::Source).to have_received(:find_task_path).with(:bar_task, :bar_source).ordered
+    end
+
+    it 'should load tasks' do
+      expect(New::Task).to have_received(:load).twice
+    end
+
+    it 'should run tasks' do
+      expect(FooTask).to have_received(:new).with({ :foo_option => true })
+      expect(BarTask).to have_received(:new).with({ :bar_option => true })
+    end
+  end
 end
