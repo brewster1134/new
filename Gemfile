@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'cli_miami', '~> 0.0'
-gem 'colorize', '~> 0.7'
+gem 'semantic', '~> 1.4'
 gem 'sourcerer_', '~> 0.0', :require => 'sourcerer'
 gem 'thor', '~> 0.19'
 

@@ -90,8 +90,6 @@ describe New do
         :foo_task => FooTask,
         :bar_task => BarTask
       }
-
-      New.new
     end
 
     after do
@@ -101,18 +99,46 @@ describe New do
       allow(New::Task).to receive(:load).and_call_original
     end
 
-    it 'should search for tasks' do
-      expect(New::Source).to have_received(:find_task_path).with(:foo_task, nil).ordered
-      expect(New::Source).to have_received(:find_task_path).with(:bar_task, :bar_source).ordered
+    context 'when initialized' do
+      before do
+        New.new '1.2.3'
+      end
+
+      it 'should search for tasks' do
+        expect(New::Source).to have_received(:find_task_path).with(:foo_task, nil).ordered
+        expect(New::Source).to have_received(:find_task_path).with(:bar_task, :bar_source).ordered
+      end
+
+      it 'should load tasks' do
+        expect(New::Task).to have_received(:load).twice
+      end
+
+      it 'should run tasks' do
+        expect(FooTask).to have_received(:new).with({ :foo_option => true })
+        expect(BarTask).to have_received(:new).with({ :bar_option => true })
+      end
     end
 
-    it 'should load tasks' do
-      expect(New::Task).to have_received(:load).twice
+    context 'when initialized via cli' do
+      before do
+        New.class_var :cli, true
+        New.new '1.2.3'
+      end
+
+      it 'should not load Newfiles' do
+        expect(New).to_not have_received(:load_newfiles)
+      end
     end
 
-    it 'should run tasks' do
-      expect(FooTask).to have_received(:new).with({ :foo_option => true })
-      expect(BarTask).to have_received(:new).with({ :bar_option => true })
+    context 'when initialized via ruby' do
+      before do
+        New.class_var :cli, false
+        New.new '1.2.3'
+      end
+
+      it 'should load Newfiles' do
+        expect(New).to have_received(:load_newfiles)
+      end
     end
   end
 end

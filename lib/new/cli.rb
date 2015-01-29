@@ -1,5 +1,6 @@
 require 'active_support/core_ext/hash/keys'
 require 'cli_miami'
+require 'semantic'
 require 'thor'
 
 class New::Cli < Thor
@@ -39,7 +40,29 @@ class New::Cli < Thor
 
   desc 'release', 'Release a new version of your project'
   def release
-    New.new
+    New.set_cli
+    New.load_newfiles
+
+    version = Semantic::Version.new New.version
+
+    # request the version to bump
+    S.ay "           Current Version: #{version.to_s.green}", type: :success
+    A.sk "  What do you want to bump: [#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)" do |response|
+      case response
+      when 'M'
+        version.major += 1
+        version.minor = 0
+        version.patch = 0
+      when 'm'
+        version.minor += 1
+        version.patch = 0
+      when 'p'
+        version.patch += 1
+      end
+    end
+    S.ay "               New Version: #{version.to_s.green}", type: :success
+
+    New.new version.to_s
   end
 
   desc 'version', 'Show the current version'

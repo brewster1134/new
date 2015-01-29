@@ -23,17 +23,26 @@ class New::Source
   def self.find_task_path task_name, source_name = nil
     # if source is specified, target it directly
     if source_name
-      return @@sources[source_name.to_sym].tasks[task_name.to_sym]
-      raise S.ay "`#{source_name}` did not contain a task called `#{task_name}`", :fail
+      if source = @@sources[source_name.to_sym]
+        if task = source.tasks[task_name.to_sym]
+          return task
+        else
+          S.ay "`#{source_name}` did not contain a task called `#{task_name}`", :fail
+        end
+      else
+        S.ay "The task `#{task_name}` set a source named `#{source_name}`, but no source could be found.", :fail
+      end
 
     # otherwise loop through sources until a template is found
     else
       @@sources.values.each do |source|
         return source.tasks[task_name.to_sym] || next
       end
-
-      raise S.ay "No task named `#{task_name}` could be found in any of the sources", :fail
+      S.ay "No task named `#{task_name}` could be found in any of the sources", :fail
     end
+
+    # if no task path is returned, exit
+    exit
   end
 
 private

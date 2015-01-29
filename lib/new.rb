@@ -14,6 +14,8 @@ class New
     }
   }
 
+  @@cli = false
+
   @@new_object = DEFAULT_NEWFILE.dup
   def self.new_object; @@new_object; end
 
@@ -51,10 +53,14 @@ class New
     defined?(value) ? value : super
   end
 
+  # set the cli flag
+  def self.set_cli; @@cli = true; end
+  def self.cli; @@cli; end
+
 private
 
-    def initialize
-      New.load_newfiles
+    def initialize version
+      New.load_newfiles unless @@cli
       New::Source.load_sources
 
       # find and load all task files
@@ -68,20 +74,4 @@ private
         New::Task.tasks[task_name].new task_options
       end
     end
-end
-
-# Get a user input value for which semantic version part to bump
-#
-def get_part
-  S.ay "            Current Version: #{New.version}", type: :success
-  A.sk " Specify which part to bump: [#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)" do |part|
-    case part
-    when 'M'
-      :major
-    when 'm'
-      :minor
-    when 'p'
-      :patch
-    end
-  end
 end

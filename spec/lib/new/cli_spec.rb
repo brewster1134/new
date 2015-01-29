@@ -80,16 +80,68 @@ describe New::Cli do
   describe '#release' do
     before do
       allow(New).to receive(:new)
+      allow(New).to receive(:load_newfiles)
+
+      New.new_object = {
+        :version => '1.2.3'
+      }
     end
 
     after do
       allow(New).to receive(:new).and_call_original
+      allow(New).to receive(:load_newfiles).and_call_original
     end
 
-    it 'should initialize' do
-      @cli.release
+    context 'when bumping any version' do
+      before do
+        allow(A).to receive(:sk).and_yield 'p'
+        @cli.release
+      end
 
-      expect(New).to have_received(:new)
+      it 'should set the cli flag' do
+        expect(New.cli).to eq true
+      end
+
+      it 'should load Newfiles and sources once' do
+        expect(New).to have_received(:load_newfiles).once
+      end
+
+      it 'should initialize' do
+        expect(New).to have_received(:new).with '1.2.4'
+      end
+    end
+
+    context 'when bumping a patch version' do
+      before do
+        allow(A).to receive(:sk).and_yield 'p'
+        @cli.release
+      end
+
+      it 'should increment the patch version' do
+        expect(New).to have_received(:new).with '1.2.4'
+      end
+    end
+
+    context 'when bumping a minor version' do
+      before do
+        allow(A).to receive(:sk).and_yield 'm'
+        @cli.release
+      end
+
+      it 'should increment the minor version and set the patch version to 0' do
+        expect(New).to have_received(:new).with '1.3.0'
+      end
+    end
+
+    context 'when bumping a major version' do
+      before do
+        allow(A).to receive(:sk).and_yield 'M'
+        @cli.release
+      end
+
+      it 'should increment the major version and set the minor & patch versions to 0' do
+        expect(New).to have_received(:new).with '2.0.0'
+      end
     end
   end
 

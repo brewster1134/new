@@ -85,18 +85,18 @@ end
 
 class Object
   def class_var var, value = nil
-    if value
-      self.send(:class_variable_set, :"@@#{var}", value)
-    else
+    if value.nil?
       self.send(:class_variable_get, :"@@#{var}")
+    else
+      self.send(:class_variable_set, :"@@#{var}", value)
     end
   end
 
   def instance_var var, value = nil
-    if value
-      self.send(:instance_variable_set, :"@#{var}", value)
-    else
+    if value.nil?
       self.send(:instance_variable_get, :"@#{var}")
+    else
+      self.send(:instance_variable_set, :"@#{var}", value)
     end
   end
 end
