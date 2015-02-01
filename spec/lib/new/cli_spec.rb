@@ -15,9 +15,6 @@ describe New::Cli do
 
   describe '#init' do
     before do
-      # set the home directory to tmp
-      stub_const 'New::HOME_DIRECTORY', root('tmp')
-
       FileUtils.rm_rf File.join(New::HOME_DIRECTORY, New::NEWFILE_NAME)
     end
 
@@ -28,7 +25,7 @@ describe New::Cli do
 
       it 'should create a default Newfile' do
         newfile_object = YAML.load(File.read(File.join(New::HOME_DIRECTORY, New::NEWFILE_NAME)))
-        expect(newfile_object['sources']['default']).to eq 'brewster1134/new-tasks'
+        expect(newfile_object['sources']['default']).to ending_with('/spec/fixtures')
       end
     end
 

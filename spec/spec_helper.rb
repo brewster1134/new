@@ -108,6 +108,13 @@ RSpec.configure do |config|
   end
 
   config.before do
+    stub_const 'New::HOME_DIRECTORY', root('tmp')
+    stub_const 'New::DEFAULT_NEWFILE', {
+      :sources => {
+        :default => root('spec', 'fixtures')
+      }
+    }
+
     allow(A).to receive(:sk)
     allow(S).to receive(:ay)
   end
