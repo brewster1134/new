@@ -1,9 +1,11 @@
-[![Gem Version](https://badge.fury.io/rb/new.svg)](http://badge.fury.io/rb/new)
-[![Build Status](https://travis-ci.org/brewster1134/new.svg?branch=master)](https://travis-ci.org/brewster1134/new)
-[![Coverage Status](https://coveralls.io/repos/brewster1134/new/badge.png)](https://coveralls.io/r/brewster1134/new)
 [![WTFPL](http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-4.png)](http://www.wtfpl.net)
+[![Gem Version](https://badge.fury.io/rb/new.svg)](http://badge.fury.io/rb/new)
+[![Dependency Status](https://gemnasium.com/brewster1134/new.svg)](https://gemnasium.com/brewster1134/new)
+[![Dependency Status](https://inch-ci.org/github/brewster1134/new.svg?branch=master&style=flat)](https://inch-ci.org/github/brewster1134/new)
+[![Build Status](https://travis-ci.org/brewster1134/new.svg?branch=master)](https://travis-ci.org/brewster1134/new)
 [![Code Climate](https://codeclimate.com/github/brewster1134/new/badges/gpa.svg)](https://codeclimate.com/github/brewster1134/new)
 [![Test Coverage](https://codeclimate.com/github/brewster1134/new/badges/coverage.svg)](https://codeclimate.com/github/brewster1134/new)
+[![Coverage Status](https://coveralls.io/repos/brewster1134/new/badge.png)](https://coveralls.io/r/brewster1134/new)
 
 # NEW
 A flexible tool for releasing your code into the wild.
