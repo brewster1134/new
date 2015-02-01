@@ -75,6 +75,7 @@ describe New do
       allow(New::Task).to receive(:load)
 
       New.class_var :new_object, {
+        :other => :option,
         :tasks => {
           :foo_task => {
             :foo_option => true
@@ -114,8 +115,8 @@ describe New do
       end
 
       it 'should run tasks' do
-        expect(FooTask).to have_received(:new).with({ :foo_option => true })
-        expect(BarTask).to have_received(:new).with({ :bar_option => true })
+        expect(FooTask).to have_received(:new).with({ :other => :option, :foo_option => true })
+        expect(BarTask).to have_received(:new).with({ :other => :option, :bar_option => true })
       end
     end
 

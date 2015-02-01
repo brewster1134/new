@@ -63,6 +63,10 @@ private
       New.load_newfiles unless @@cli
       New::Source.load_sources
 
+      # copy the new object and remove other task options
+      new_object = @@new_object.dup
+      new_object.delete(:tasks)
+
       # find and load all task files
       New.tasks.each do |task_name, task_options|
         task_path = New::Source.find_task_path task_name, task_options.delete(:source)
@@ -71,7 +75,7 @@ private
 
       # run all tasks
       New.tasks.each do |task_name, task_options|
-        New::Task.tasks[task_name].new task_options
+        New::Task.tasks[task_name].new new_object.deep_merge(task_options)
       end
     end
 end

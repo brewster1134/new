@@ -1,6 +1,40 @@
+require "codeclimate-test-reporter"
+CodeClimate::TestReporter.start
 require 'coveralls'
 Coveralls.wear!
 require 'new'
+
+# load sources and create symlinks to all the task folders for rspec to pickup
+# TODO: still need a way to add them to guard watch list tho
+New.load_newfiles
+New::Source.load_sources
+New::Source.sources.each do |source_name, source|
+  source.tasks.each do |task_name, task_path|
+    `ln -s #{File.dirname(task_path)} spec/lib/tasks`
+  end
+end
+
+class Object
+  def class_var var, value = nil
+    if value.nil?
+      self.send(:class_variable_get, :"@@#{var}")
+    else
+      self.send(:class_variable_set, :"@@#{var}", value)
+    end
+  end
+
+  def instance_var var, value = nil
+    if value.nil?
+      self.send(:instance_variable_get, :"@#{var}")
+    else
+      self.send(:instance_variable_set, :"@#{var}", value)
+    end
+  end
+end
+
+def root *paths
+  paths.unshift(File.expand_path(File.join(File.dirname(__FILE__), '..'))).compact.join '/'
+end
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
@@ -70,6 +104,7 @@ RSpec.configure do |config|
 
   config.after :suite do
     FileUtils.rm_rf root('tmp')
+    FileUtils.rm_rf Dir[root('spec', 'lib', 'tasks', '**')]
   end
 
   config.before do
@@ -81,26 +116,4 @@ RSpec.configure do |config|
     allow(A).to receive(:sk).and_call_original
     allow(S).to receive(:ay).and_call_original
   end
-end
-
-class Object
-  def class_var var, value = nil
-    if value.nil?
-      self.send(:class_variable_get, :"@@#{var}")
-    else
-      self.send(:class_variable_set, :"@@#{var}", value)
-    end
-  end
-
-  def instance_var var, value = nil
-    if value.nil?
-      self.send(:instance_variable_get, :"@#{var}")
-    else
-      self.send(:instance_variable_set, :"@#{var}", value)
-    end
-  end
-end
-
-def root *paths
-  paths.unshift(File.expand_path(File.join(File.dirname(__FILE__), '..'))).compact.join '/'
 end
