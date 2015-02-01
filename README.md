@@ -5,7 +5,8 @@
 [![build](https://travis-ci.org/brewster1134/new.svg?branch=master)](https://travis-ci.org/brewster1134/new)
 [![code climate](https://codeclimate.com/github/brewster1134/new/badges/gpa.svg)](https://codeclimate.com/github/brewster1134/new)
 [![coverage](https://codeclimate.com/github/brewster1134/new/badges/coverage.svg)](https://codeclimate.com/github/brewster1134/new)
-[![coverage](https://coveralls.io/repos/brewster1134/new/badge.png)](https://coveralls.io/r/brewster1134/new)
+[![coverage](https://coveralls.io/repos/brewster1134/new/badge.svg?branch=master)](https://coveralls.io/r/brewster1134/new?branch=master)
+
 
 # NEW
 A flexible tool for releasing your code into the wild.
