@@ -1,4 +1,3 @@
-[![WTFPL](http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-4.png)](http://www.wtfpl.net)
 [![gem version](https://badge.fury.io/rb/new.svg)](https://rubygems.org/gems/new)
 [![dependencies](https://gemnasium.com/brewster1134/new.svg)](https://gemnasium.com/brewster1134/new)
 [![docs](http://inch-ci.org/github/brewster1134/new.svg?branch=master)](http://inch-ci.org/github/brewster1134/new)
@@ -78,3 +77,5 @@ bower install
 ```shell
 testem
 ```
+
+[![WTFPL](http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-4.png)](http://www.wtfpl.net)
