@@ -4,6 +4,12 @@ require 'coveralls'
 Coveralls.wear!
 require 'new'
 
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  CodeClimate::TestReporter::Formatter,
+  Coveralls::SimpleCov::Formatter,
+  SimpleCov::Formatter::HTMLFormatter
+]
+
 # load sources and create symlinks to all the task folders for rspec to pickup
 # only do this locally, not with ci
 # TODO: still need a way to add them to guard watch list tho

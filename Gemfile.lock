@@ -113,7 +113,7 @@ PLATFORMS
 
 DEPENDENCIES
   cli_miami (~> 0.0)
-  codeclimate-test-reporter
+  codeclimate-test-reporter (~> 0.4)
   coveralls (~> 0.7)
   guard (~> 2.6)
   guard-bundler (~> 2.1)
