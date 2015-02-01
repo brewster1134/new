@@ -1,9 +1,6 @@
 language: ruby
 install: bundle install --without development
 script: bundle exec rspec
-addons:
-  code_climate:
-    repo_token: 75a71b05ca464ea0abc3765226a536c8efdf9fd09b0c704833d8c16349cba6a6
 rvm:
   - 1.9.3-p550
   - 2.0.0-p0
