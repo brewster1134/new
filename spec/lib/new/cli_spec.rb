@@ -1,5 +1,7 @@
 describe New::Cli do
   before do
+    allow(New).to receive(:load_newfiles)
+
     # run all cli commands from the project fixture directory
     @pwd = FileUtils.pwd
     FileUtils.chdir root('spec', 'fixtures', 'project')
@@ -9,6 +11,8 @@ describe New::Cli do
   end
 
   after do
+    allow(New).to receive(:load_newfiles).and_call_original
+
     # change back to root for the rest of the tests
     FileUtils.chdir @pwd
   end
@@ -25,7 +29,7 @@ describe New::Cli do
 
       it 'should create a default Newfile' do
         newfile_object = YAML.load(File.read(File.join(New::HOME_DIRECTORY, New::NEWFILE_NAME)))
-        expect(newfile_object['sources']['default']).to ending_with('/spec/fixtures')
+        expect(newfile_object['sources']['default']).to be_a String
       end
     end
 
@@ -47,7 +51,6 @@ describe New::Cli do
 
   describe '#tasks' do
     before do
-      allow(New).to receive(:load_newfiles)
       allow(New::Source).to receive(:load_sources)
       allow(New::Source).to receive(:sources).and_return({
         :source_name => OpenStruct.new({ :path => '/source', :tasks => { :task_name => 'task' }}),
@@ -57,7 +60,6 @@ describe New::Cli do
     end
 
     after do
-      allow(New).to receive(:load_newfiles).and_call_original
       allow(New::Source).to receive(:load_sources).and_call_original
       allow(New::Source).to receive(:sources).and_call_original
     end
@@ -77,7 +79,6 @@ describe New::Cli do
   describe '#release' do
     before do
       allow(New).to receive(:new)
-      allow(New).to receive(:load_newfiles)
 
       New.new_object = {
         :version => '1.2.3'
@@ -86,7 +87,6 @@ describe New::Cli do
 
     after do
       allow(New).to receive(:new).and_call_original
-      allow(New).to receive(:load_newfiles).and_call_original
     end
 
     context 'when bumping any version' do
@@ -144,16 +144,10 @@ describe New::Cli do
 
   describe '#version' do
     before do
-      allow(New).to receive(:load_newfiles)
-
       New.class_var :new_object, {
         :name => 'Project Name',
         :version => '1.2.3'
       }
-    end
-
-    after do
-      allow(New).to receive(:load_newfiles).and_call_original
     end
 
     it 'should return the current version' do
