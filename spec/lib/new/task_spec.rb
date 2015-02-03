@@ -20,6 +20,7 @@ describe New::Task do
 
   context '.inherited' do
     it 'should add task to global array' do
+      puts New::Task.class_var(:tasks).inspect
       expect(New::Task.class_var(:tasks)[:task]).to eq New::TaskTask
     end
   end
