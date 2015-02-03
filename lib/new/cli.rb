@@ -73,7 +73,7 @@ class New::Cli < Thor
     S.ay New.new_object[:version], :color => :green, :indent => 1
   end
 
-  desc 'test', 'Run task tests'
+  desc 'test', 'Run task tests from sources'
   option :watch, :type => :boolean, :aliases => ['-w'], :desc => 'Watch local tasks for changes and run tests'
   option :source, :type => :string, :aliases => ['-s'], :desc => 'Source name'
   option :task, :type => :string, :aliases => ['-t'], :desc => 'Task name'

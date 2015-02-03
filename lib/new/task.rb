@@ -5,8 +5,8 @@ class New::Task
   # when custom task is required, add the class to the global hash to initialize later
   #
   def self.inherited subclass
-    # create name from task file name
-    # e.g. foo_task.rb => `foo`
+    # create symbolized name from task file name
+    # e.g. foo_task.rb => :foo
     task_name = caller.first.match(/([^\/]*)_task\.rb.*$/)[1].to_sym
     @@tasks[task_name] = subclass
   end
