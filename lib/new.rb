@@ -75,7 +75,9 @@ private
 
       # run all tasks
       New.tasks.each do |task_name, task_options|
-        New::Task.tasks[task_name].new new_object.deep_merge(task_options)
+        task_class = New::Task.tasks[task_name]
+        task_default_options = task_class::DEFAULT_OPTIONS rescue {}
+        task_class.new new_object.deep_merge(task_default_options).deep_merge(task_options)
       end
     end
 end

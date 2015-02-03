@@ -157,4 +157,26 @@ describe New::Cli do
       expect(S).to have_received(:ay).with '1.2.3', anything
     end
   end
+
+  describe.skip '#test' do
+    before do
+      allow(New).to receive(:load_newfiles)
+
+      New.class_var :new_object, {
+        :sources => {
+          :default => root('spec', 'fixtures')
+        }
+      }
+
+      @cli.test
+    end
+
+    after do
+      allow(New).to receive(:load_newfiles).and_call_original
+    end
+
+    it 'should run rspec with task paths' do
+      expect(@cli).to receive(:system).with "bundle exec rspec #{root('spec', 'fixtures', 'task', 'task_task_spec.rb')}"
+    end
+  end
 end

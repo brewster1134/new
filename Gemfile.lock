@@ -110,6 +110,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bundler (~> 1.7)
   cli_miami (~> 0.0)
   coveralls (~> 0.7)
   guard (~> 2.6)

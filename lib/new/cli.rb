@@ -72,5 +72,35 @@ class New::Cli < Thor
     S.ay New.new_object[:version], :color => :green, :indent => 1
   end
 
+  desc 'test', 'Run task tests'
+  option :source, :type => :string, :aliases => ['-s'], :desc => 'Source name'
+  option :task, :type => :string, :aliases => ['-t'], :desc => 'Task name'
+  def test
+    specs = []
+
+    New.load_newfiles
+    New::Source.load_sources
+
+    # create an array with a single source if passed, otherwise check all sources
+    sources = options['source'] ? [New::Source.sources[options['source'].to_sym]] : New::Source.sources
+    sources.each do |source_name, source|
+      # create an array with a single task if passed, otherwise check all tasks
+      tasks = options['task'] ? [source.tasks[options['task'].to_sym]] : source.tasks
+      tasks.each do |task_name, task_path|
+        spec_path = File.join(File.dirname(task_path), "#{task_name}_task_spec.rb")
+
+        if File.file? spec_path
+          specs << spec_path
+        else
+          S.ay "No spec exists for the `#{task_name}` task in the `#{source_name}` source", :warn
+        end
+      end
+    end
+
+    unless specs.empty?
+      system "bundle exec rspec #{specs.join(' ')}"
+    end
+  end
+
   default_task :release
 end

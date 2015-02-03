@@ -2,19 +2,6 @@ require 'coveralls'
 Coveralls.wear!
 require 'new'
 
-# load sources and create symlinks to all the task folders for rspec to pickup
-# only do this locally, not with ci
-# TODO: still need a way to add them to guard watch list tho
-unless ENV['CI']
-  New.load_newfiles
-  New::Source.load_sources
-  New::Source.sources.each do |source_name, source|
-    source.tasks.each do |task_name, task_path|
-      `ln -s #{File.dirname(task_path)} spec/lib/tasks`
-    end
-  end
-end
-
 class Object
   def class_var var, value = nil
     if value.nil?
@@ -105,7 +92,6 @@ RSpec.configure do |config|
 
   config.after :suite do
     FileUtils.rm_rf root('tmp')
-    FileUtils.rm_rf Dir[root('spec', 'lib', 'tasks', '**')]
   end
 
   config.before do

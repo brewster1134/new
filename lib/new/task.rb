@@ -13,5 +13,10 @@ class New::Task
 
   def self.load task_path
     require task_path.sub(/\.rb$/, '')
+
+    task_gemfile_path = File.join(File.dirname(task_path), 'Gemfile')
+    if File.file? task_gemfile_path
+      system "bundle install --gemfile=#{task_gemfile_path}"
+    end
   end
 end

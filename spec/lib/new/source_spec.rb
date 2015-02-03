@@ -12,6 +12,10 @@ describe New::Source do
       New::Source.load_sources
     end
 
+    after do
+      allow(New::Source).to receive(:new).and_call_original
+    end
+
     it 'should collect initialized sources' do
       expect(New::Source.class_var(:sources)[:foo]).to eq 'new source'
     end

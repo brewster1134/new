@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'bundler', '~> 1.7'
 gem 'cli_miami', '~> 0.0'
 gem 'semantic', '~> 1.4'
 gem 'sourcerer_', '~> 0.0', :require => 'sourcerer'
