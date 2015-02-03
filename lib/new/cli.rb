@@ -1,5 +1,6 @@
 require 'active_support/core_ext/hash/keys'
 require 'cli_miami'
+require 'listen'
 require 'semantic'
 require 'thor'
 
@@ -73,32 +74,69 @@ class New::Cli < Thor
   end
 
   desc 'test', 'Run task tests'
+  option :watch, :type => :boolean, :aliases => ['-w'], :desc => 'Watch local tasks for changes and run tests'
   option :source, :type => :string, :aliases => ['-s'], :desc => 'Source name'
   option :task, :type => :string, :aliases => ['-t'], :desc => 'Task name'
   def test
-    specs = []
+    watch_dirs = []
 
     New.load_newfiles
     New::Source.load_sources
 
-    # create an array with a single source if passed, otherwise check all sources
-    sources = options['source'] ? [New::Source.sources[options['source'].to_sym]] : New::Source.sources
+    # create a hash with a single source if one is passed
+    sources = if options['source']
+      source_name = options['source'].to_sym
+      source_hash = {}
+      source_hash[source_name] = New::Source.sources[source_name]
+      source_hash
+    else
+      New::Source.sources
+    end
+
     sources.each do |source_name, source|
-      # create an array with a single task if passed, otherwise check all tasks
+      next unless source
+
+      # create a hash with a single task if one is passed
       tasks = options['task'] ? [source.tasks[options['task'].to_sym]] : source.tasks
+      tasks = if options['task']
+        task_name = options['task'].to_sym
+        task_hash = {}
+        task_hash[task_name] = source.tasks[task_name]
+        task_hash
+      else
+        source.tasks
+      end
+
       tasks.each do |task_name, task_path|
+        next unless task_path
+
         spec_path = File.join(File.dirname(task_path), "#{task_name}_task_spec.rb")
 
-        if File.file? spec_path
-          specs << spec_path
-        else
-          S.ay "No spec exists for the `#{task_name}` task in the `#{source_name}` source", :warn
+        # if the source/task has a spec file, and the source is local, watch the task directory for changes and run the spec whenever anything changes
+        if File.file?(spec_path) && File.directory?(source.path)
+          # find task directory in original path, not the sourcerer tmp directory
+          original_task_dir_path = File.dirname(Dir[File.join(source.path, '**', File.basename(task_path))][0])
+
+          watch_dirs << original_task_dir_path
         end
+
+        S.ay "Running tests for `#{task_name}` task in `#{source_name}` source...", :warn
+        system "bundle exec rspec #{spec_path}"
       end
     end
 
-    unless specs.empty?
-      system "bundle exec rspec #{specs.join(' ')}"
+    # if watch files are found, start a listener to run the spec
+    if options['watch'] && !watch_dirs.empty?
+      listener = Listen.to *watch_dirs do |modified, added, removed|
+        all = modified + added + removed
+
+        # find sibling spec file from modified file
+        spec_path = all.collect{ |file| Dir[File.join(File.dirname(file), '*_spec.rb')] }.flatten.first
+
+        system "bundle exec rspec #{spec_path}"
+      end
+      listener.start
+      sleep
     end
   end
 

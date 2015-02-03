@@ -116,6 +116,7 @@ DEPENDENCIES
   guard (~> 2.6)
   guard-bundler (~> 2.1)
   guard-rspec (~> 4.3)
+  listen (~> 2.8)
   rspec (~> 3.1)
   semantic (~> 1.4)
   sourcerer_ (~> 0.0)

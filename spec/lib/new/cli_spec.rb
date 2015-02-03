@@ -160,6 +160,10 @@ describe New::Cli do
 
   describe.skip '#test' do
     before do
+      dbl = double
+      allow(dbl).to receive(:start)
+      allow_any_instance_of(New::Cli).to receive(:sleep)
+      allow(Listen).to receive(:to).and_return dbl
       allow(New).to receive(:load_newfiles)
 
       New.class_var :new_object, {
@@ -172,11 +176,13 @@ describe New::Cli do
     end
 
     after do
+      allow_any_instance_of(New::Cli).to receive(:sleep).and_call_original
+      allow(Listen).to receive(:to).and_call_original
       allow(New).to receive(:load_newfiles).and_call_original
     end
 
     it 'should run rspec with task paths' do
-      expect(@cli).to receive(:system).with "bundle exec rspec #{root('spec', 'fixtures', 'task', 'task_task_spec.rb')}"
+      expect(Listen).to have_received(:to).with root('spec', 'fixtures')
     end
   end
 end
