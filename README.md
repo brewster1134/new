@@ -9,7 +9,9 @@
 A flexible tool for releasing your code into the wild.
 
 ### Dependencies
-*
+* ruby
+  * ~> 1.9.3
+  * ~> 2.0.0-p195
 
 ---
 ## Markup
