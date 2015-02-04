@@ -60,6 +60,12 @@ class New
 private
 
     def initialize version
+      # update options with new version
+      New.new_object = {
+        :version => version
+      }
+
+      # load newfiles and sources
       New.load_newfiles unless @@cli
       New::Source.load_sources
 

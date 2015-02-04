@@ -115,8 +115,12 @@ describe New do
       end
 
       it 'should run tasks' do
-        expect(FooTask).to have_received(:new).with({ :other => :option, :foo_option => true })
-        expect(BarTask).to have_received(:new).with({ :other => :option, :bar_option => true })
+        expect(FooTask).to have_received(:new).with({ :other => :option, :version => '1.2.3', :foo_option => true })
+        expect(BarTask).to have_received(:new).with({ :other => :option, :version => '1.2.3', :bar_option => true })
+      end
+
+      it 'should update the new_object with the new version' do
+        expect(New.new_object[:version]).to eq '1.2.3'
       end
     end
 
