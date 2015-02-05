@@ -87,6 +87,7 @@ RSpec.configure do |config|
   end
 
   config.before :suite do
+    require root('spec', 'fixtures', 'task', 'task_task')
     FileUtils.mkdir_p root('tmp')
   end
 

@@ -1,24 +1,36 @@
-describe.skip New::Task do
-  before do
-    allow(New::Task).to receive(:require)
-    allow(New::Task).to receive(:system)
-    @task = New::Task.load root('spec', 'fixtures', 'task', 'task_task.rb')
+describe New::Task do
+  before :all do
   end
 
-  after do
-    allow(New::Task).to receive(:require).and_call_original
-    allow(New::Task).to receive(:system).and_call_original
+  describe '.inherited' do
+    before do
+      @task = New::TaskTask.new({})
+    end
+
+    it 'should assign to the subclass' do
+      expect(@task.path).to ending_with 'task_task.rb'
+      expect(@task.name).to eq :task
+    end
+
+    it 'should add to global object' do
+      expect(New::Task.tasks[:task]).to eq New::TaskTask
+    end
   end
 
-  it 'should require the task' do
-    expect(New::Task).to have_received(:require).with root('spec', 'fixtures', 'task', 'task_task')
-  end
+  describe '#bundle_install' do
+    before do
+      @task = New::TaskTask.new({})
+      allow(@task).to receive(:system)
+      @task.bundle_install
+    end
 
-  it 'should install gems' do
-    expect(New::Task).to have_received(:system).with "bundle install --gemfile=#{root('spec', 'fixtures', 'task', 'Gemfile')}"
-  end
+    after do
+      allow(@task).to receive(:system).and_call_original
+    end
 
-  it 'should add task to global array' do
-    expect(New::Task.class_var(:tasks)[:task]).to eq New::TaskTask
+    it 'should run bundler with task Gemfile' do
+      expect(@task).to have_received(:system).with starting_with 'bundle install --gemfile='
+      expect(@task).to have_received(:system).with ending_with '/task/Gemfile'
+    end
   end
 end

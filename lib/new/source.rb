@@ -10,7 +10,7 @@ class New::Source
   #
   def self.load_sources
     New.sources.each do |name, path|
-      @@sources[name] = New::Source.new(path)
+      @@sources[name] = New::Source.new path
     end
   end
 
@@ -20,11 +20,11 @@ class New::Source
   #
   # @return [String] valid task path
   #
-  def self.find_task_path task_name, source_name = nil
+  def self.find_task task_name, source_name = nil
     # if source is specified, target it directly
     if source_name
-      if source = @@sources[source_name.to_sym]
-        if task = source.tasks[task_name.to_sym]
+      if source = @@sources[source_name]
+        if task = source.tasks[task_name]
           return task
         else
           S.ay "`#{source_name}` did not contain a task called `#{task_name}`", :fail
@@ -36,7 +36,7 @@ class New::Source
     # otherwise loop through sources until a template is found
     else
       @@sources.values.each do |source|
-        return source.tasks[task_name.to_sym] || next
+        return source.tasks[task_name] || next
       end
       S.ay "No task named `#{task_name}` could be found in any of the sources", :fail
     end
@@ -53,8 +53,12 @@ private
       # fetch source and create tasks
       source = Sourcerer.new path
       source.files('**/*_task.rb').each do |task_file_path|
-        task_name = task_file_path.match(/([^\/]*)_task\.rb$/)[1].to_sym
-        @tasks[task_name] = task_file_path
+        # load task ruby file
+        load task_file_path
+
+        # add new task class to task object
+        task_name = New::Task.get_task_name task_file_path
+        @tasks[task_name] = New::Task.tasks[task_name]
       end
 
       # set path to sourcerer path

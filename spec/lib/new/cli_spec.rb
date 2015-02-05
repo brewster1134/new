@@ -17,9 +17,17 @@ describe New::Cli do
     FileUtils.chdir @pwd
   end
 
-  describe '#init' do
+  describe.skip '#init' do
     before do
-      FileUtils.rm_rf File.join(New::HOME_DIRECTORY, New::NEWFILE_NAME)
+      @cli.options = {
+        'name' => 'Foo Name',
+        'version' => '1.2.3',
+        'tasks' => ['task_foo', 'task_bar']
+      }
+    end
+
+    it 'should create a Newfile with basic options' do
+
     end
 
     context 'when home Newfile doesnt exist' do

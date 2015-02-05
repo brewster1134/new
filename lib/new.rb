@@ -73,15 +73,9 @@ private
       new_object = @@new_object.dup
       new_object.delete(:tasks)
 
-      # find and load all task files
-      New.tasks.each do |task_name, task_options|
-        task_path = New::Source.find_task_path task_name, task_options.delete(:source)
-        New::Task.load task_path
-      end
-
       # run all tasks
       New.tasks.each do |task_name, task_options|
-        task_class = New::Task.tasks[task_name]
+        task_class = New::Source.find_task task_name, task_options.delete(:source)
         task_default_options = task_class::DEFAULT_OPTIONS rescue {}
         task_class.new new_object.deep_merge(task_default_options).deep_merge(task_options)
       end

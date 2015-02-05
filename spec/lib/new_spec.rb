@@ -71,10 +71,9 @@ describe New do
       allow(BarTask).to receive(:new)
       allow(New).to receive(:load_newfiles)
       allow(New::Source).to receive(:load_sources)
-      allow(New::Source).to receive(:find_task_path)
-      allow(New::Task).to receive(:load)
+      allow(New::Source).to receive(:find_task).and_return FooTask, BarTask
 
-      New.class_var :new_object, {
+      New.new_object = {
         :other => :option,
         :tasks => {
           :foo_task => {
@@ -87,17 +86,17 @@ describe New do
         }
       }
 
-      New::Task.class_var :tasks, {
+      tasks = New::Task.class_var(:tasks).merge({
         :foo_task => FooTask,
         :bar_task => BarTask
-      }
+      })
+      New::Task.class_var :tasks, tasks
     end
 
     after do
       allow(New).to receive(:load_newfiles).and_call_original
       allow(New::Source).to receive(:load_sources).and_call_original
-      allow(New::Source).to receive(:find_task_path).and_call_original
-      allow(New::Task).to receive(:load).and_call_original
+      allow(New::Source).to receive(:find_task).and_call_original
     end
 
     context 'when initialized' do
@@ -106,17 +105,13 @@ describe New do
       end
 
       it 'should search for tasks' do
-        expect(New::Source).to have_received(:find_task_path).with(:foo_task, nil).ordered
-        expect(New::Source).to have_received(:find_task_path).with(:bar_task, :bar_source).ordered
-      end
-
-      it 'should load tasks' do
-        expect(New::Task).to have_received(:load).twice
+        expect(New::Source).to have_received(:find_task).with(:foo_task, nil).ordered
+        expect(New::Source).to have_received(:find_task).with(:bar_task, :bar_source).ordered
       end
 
       it 'should run tasks' do
-        expect(FooTask).to have_received(:new).with({ :other => :option, :version => '1.2.3', :foo_option => true })
-        expect(BarTask).to have_received(:new).with({ :other => :option, :version => '1.2.3', :bar_option => true })
+        expect(FooTask).to have_received(:new).with hash_including({ :other => :option, :version => '1.2.3', :foo_option => true })
+        expect(BarTask).to have_received(:new).with hash_including({ :other => :option, :version => '1.2.3', :bar_option => true })
       end
 
       it 'should update the new_object with the new version' do
