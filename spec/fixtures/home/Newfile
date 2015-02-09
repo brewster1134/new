@@ -1,0 +1,3 @@
+# home Newfile fixture
+sources:
+  spec: spec/fixtures/source
