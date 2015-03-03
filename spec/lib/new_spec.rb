@@ -1,144 +1,59 @@
 describe New do
+  # Newfiles are preloaded in spec_helper
+  #
   describe '.load_newfiles' do
-    before do
-      allow(New).to receive(:load_newfile)
-
-      New.load_newfiles
-    end
-
-    after do
-      allow(New).to receive(:load_newfile).and_call_original
-    end
-
-    it 'should load home Newfile' do
-      expect(New).to have_received(:load_newfile).with(File.join(New::HOME_DIRECTORY, New::NEWFILE_NAME))
-    end
-
-    it 'should load project Newfile' do
-      expect(New).to have_received(:load_newfile).with(File.join(Dir.pwd, New::NEWFILE_NAME))
-    end
-  end
-
-  describe '.load_newfile' do
-    before do
-      allow(New).to receive(:new_object=)
-
-      New.send :load_newfile, root('spec', 'fixtures', New::NEWFILE_NAME)
-    end
-
-    after do
-      allow(New).to receive(:new_object=).and_call_original
-    end
-
-    it 'should load yaml Newfile as ruby hash' do
-      expect(New).to have_received(:new_object=).with hash_including({ 'sources' => hash_including({ 'home_local' => '/home_local/source' })})
-    end
-  end
-
-  describe '.new_object=' do
-    before do
-      New.class_var :new_object, {
-        :foo => {
-          :bar => 'baz'
-        }
-      }
-
-      New.send :new_object=, {
-        'foo' => {
-          'bar' => 'foobar'
-        }
-      }
-    end
-
-    it 'should merge data into a symbolized hash' do
-      expect(New.class_var(:new_object)).to eq({
-        :foo => {
-          :bar => 'foobar'
+    it 'should add home & project Newfile symbolized data to global new object' do
+      expect(New.new_object).to eq({
+        :name => 'Project Fixture',
+        :version => '1.2.3',
+        :sources => {
+          :spec => 'spec/fixtures/source'
+        },
+        :tasks => {
+          :task => {
+            :source => 'spec'
+          }
         }
       })
+    end
+  end
+
+  describe '.cli' do
+    before do
+      New.class_var :cli, false
+      New.set_cli
+    end
+
+    it 'should toggle cli to true' do
+      expect(New.class_var(:cli)).to eq true
     end
   end
 
   describe '#initialize' do
     before do
-      class FooTask
-        def initialize options; end
-      end
-      class BarTask
-        def initialize options; end
-      end
-      allow(FooTask).to receive(:new)
-      allow(BarTask).to receive(:new)
-      allow(New).to receive(:load_newfiles)
-      allow(New::Source).to receive(:load_sources)
-      allow(New::Source).to receive(:find_task).and_return FooTask, BarTask
+      @task = New::Task.tasks[:task]
 
-      New.new_object = {
-        :other => :option,
-        :tasks => {
-          :foo_task => {
-            :foo_option => true
-          },
-          :bar_task => {
-            :source => :bar_source,
-            :bar_option => true
-          }
-        }
-      }
+      allow(@task).to receive(:run)
+      allow(New::Source).to receive(:find_task).and_call_original
 
-      tasks = New::Task.class_var(:tasks).merge({
-        :foo_task => FooTask,
-        :bar_task => BarTask
-      })
-      New::Task.class_var :tasks, tasks
+      New.new '1.2.4'
     end
 
     after do
-      allow(New).to receive(:load_newfiles).and_call_original
-      allow(New::Source).to receive(:load_sources).and_call_original
+      allow(@task).to receive(:run).and_call_original
       allow(New::Source).to receive(:find_task).and_call_original
     end
 
-    context 'when initialized' do
-      before do
-        New.new '1.2.3'
-      end
-
-      it 'should search for tasks' do
-        expect(New::Source).to have_received(:find_task).with(:foo_task, nil).ordered
-        expect(New::Source).to have_received(:find_task).with(:bar_task, :bar_source).ordered
-      end
-
-      it 'should run tasks' do
-        expect(FooTask).to have_received(:new).with hash_including({ :other => :option, :version => '1.2.3', :foo_option => true })
-        expect(BarTask).to have_received(:new).with hash_including({ :other => :option, :version => '1.2.3', :bar_option => true })
-      end
-
-      it 'should update the new_object with the new version' do
-        expect(New.new_object[:version]).to eq '1.2.3'
-      end
+    it 'should add new version' do
+      expect(New.new_object[:version]).to eq '1.2.4'
     end
 
-    context 'when initialized via cli' do
-      before do
-        New.class_var :cli, true
-        New.new '1.2.3'
-      end
-
-      it 'should not load Newfiles' do
-        expect(New).to_not have_received(:load_newfiles)
-      end
+    it 'should lookup task from source' do
+      expect(New::Source).to have_received(:find_task).with :task, :spec
     end
 
-    context 'when initialized via ruby' do
-      before do
-        New.class_var :cli, false
-        New.new '1.2.3'
-      end
-
-      it 'should load Newfiles' do
-        expect(New).to have_received(:load_newfiles)
-      end
+    it 'should call run on tasks' do
+      expect(@task).to have_received(:run)
     end
   end
 end

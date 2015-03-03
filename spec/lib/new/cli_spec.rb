@@ -1,75 +1,151 @@
+require 'tmpdir'
+
 describe New::Cli do
   before do
-    allow(New).to receive(:load_newfiles)
-
-    # run all cli commands from the project fixture directory
+    # run all cli commands from a tmp project directory
     @pwd = FileUtils.pwd
-    FileUtils.chdir root('spec', 'fixtures', 'project')
+    FileUtils.chdir New::PROJECT_DIRECTORY
 
     # initialize cli instance
     @cli = New::Cli.new
+
+    # get initialized spec task
+    @task = New::Task.tasks[:task]
+
+    # proc to load the proejct newfile
+    @project_newfile = -> { File.read(File.join(New::PROJECT_DIRECTORY, New::NEWFILE_NAME)) }
   end
 
   after do
-    allow(New).to receive(:load_newfiles).and_call_original
-
-    # change back to root for the rest of the tests
+    # # change back to root for the rest of the tests
     FileUtils.chdir @pwd
   end
 
-  describe.skip '#init' do
+  describe '#init' do
     before do
+      stub_const 'New::NEWFILE_NAME', 'Newfile_spec'
+
       @cli.options = {
         'name' => 'Foo Name',
         'version' => '1.2.3',
-        'tasks' => ['task_foo', 'task_bar']
+        'tasks' => ['spec#task']
       }
     end
 
-    it 'should create a Newfile with basic options' do
-
+    after do
+      FileUtils.rm File.join(New::PROJECT_DIRECTORY, New::NEWFILE_NAME)
+      stub_const 'New::NEWFILE_NAME', 'Newfile'
     end
 
-    context 'when home Newfile doesnt exist' do
-      before do
+    it 'should write the name and version' do
+      New::Task.tasks[:task].instance_var :options, {}
+      @cli.init
+      pn = @project_newfile[]
+
+      expect(pn).to include 'name: Foo Name'
+      expect(pn).to include 'version: 1.2.3'
+    end
+
+    context 'with array option' do
+      it 'should ask for multiple array values' do
+        responses = ['1', 'foo', '2', '']
+        allow(A).to receive(:sk) do |text, options, &block|
+          block.call responses.shift
+        end
+
+        New::Task.tasks[:task].instance_var :options, {
+          :array => {
+            :description => 'Array',
+            :type => Array,
+            :validation => Integer
+          }
+        }
         @cli.init
+        pn = @project_newfile[]
+
+        expect(pn).to include "tasks:\n  array:\n  - 1\n  - 2"
       end
 
-      it 'should create a default Newfile' do
-        newfile_object = YAML.load(File.read(File.join(New::HOME_DIRECTORY, New::NEWFILE_NAME)))
-        expect(newfile_object['sources']['default']).to be_a String
+      context 'when required' do
+        it 'should not allow an empty array' do
+          responses = ['', 'foo', '']
+          allow(A).to receive(:sk) do |text, &block|
+            block.call responses.shift
+          end
+
+          New::Task.tasks[:task].instance_var :options, {
+            :array => {
+              :description => 'Array',
+              :required => true,
+              :type => Array
+            }
+          }
+          @cli.init
+          pn = @project_newfile[]
+
+          expect(pn).to include "tasks:\n  array:\n  - foo"
+        end
+      end
+
+      context 'when not required' do
+        it 'should allow an empty array' do
+          allow(A).to receive(:sk).and_yield('')
+          New::Task.tasks[:task].instance_var :options, {
+            :array => {
+              :description => 'Array',
+              :required => false,
+              :type => Array
+            }
+          }
+          @cli.init
+          pn = @project_newfile[]
+
+          expect(pn).to include "tasks:\n  array: []"
+        end
       end
     end
 
-    context 'when home Newfile already exists' do
-      before do
-        allow(File).to receive(:open).and_call_original
+    context 'with hash option (with array validation)' do
+      it 'should ask for multiple hash values' do
+        allow(A).to receive(:sk).and_yield('baz')
+        New::Task.tasks[:task].instance_var :options, {
+          :hash => {
+            :description => 'Hash',
+            :type => Hash,
+            :validation => [:foo, :bar]
+          }
+        }
+        @cli.init
+        pn = @project_newfile[]
 
-        # call twice... once to create the file, and again to test when it already exists
-        @cli.init
-        @cli.init
+        expect(pn).to include "tasks:\n  hash:\n    foo: baz\n    bar: baz"
       end
+    end
 
-      it 'should not attempt to create a Newfile' do
-        expect(File).to have_received(:open).once
-        expect(S).to have_received(:ay).twice
+    context 'with hash option (with hash validation)' do
+      it 'should ask for multiple hash values' do
+        allow(A).to receive(:sk).and_yield('1')
+        New::Task.tasks[:task].instance_var :options, {
+          :hash => {
+            :description => 'Hash',
+            :type => Hash,
+            :validation => {
+              :foo => Integer,
+              :bar => Integer
+            }
+          }
+        }
+        @cli.init
+        pn = @project_newfile[]
+
+        expect(pn).to include "tasks:\n  hash:\n    foo: 1\n    bar: 1"
       end
     end
   end
 
   describe '#tasks' do
     before do
-      allow(New::Source).to receive(:load_sources)
-      allow(New::Source).to receive(:sources).and_return({
-        :source_name => OpenStruct.new({ :path => '/source', :tasks => { :task_name => 'task' }}),
-      })
-
       @cli.tasks
-    end
-
-    after do
-      allow(New::Source).to receive(:load_sources).and_call_original
-      allow(New::Source).to receive(:sources).and_call_original
     end
 
     it 'should request to load newfiles and sources' do
@@ -78,9 +154,10 @@ describe New::Cli do
     end
 
     it 'should list all available tasks' do
-      expect(S).to have_received(:ay).with('source_name', anything).ordered
-      expect(S).to have_received(:ay).with(including('/source'), anything).ordered
-      expect(S).to have_received(:ay).with('task_name', anything).ordered
+      expect(S).to have_received(:ay).with('spec', anything).ordered
+      expect(S).to have_received(:ay).with(including('/spec/fixtures'), anything).ordered
+      expect(S).to have_received(:ay).with('task', anything).ordered
+      expect(S).to have_received(:ay).with('Spec Task Description').ordered
     end
   end
 
@@ -99,12 +176,12 @@ describe New::Cli do
 
     context 'when bumping any version' do
       before do
-        allow(A).to receive(:sk).and_yield 'p'
+        allow(A).to receive(:sk).and_yield('p')
         @cli.release
       end
 
       it 'should set the cli flag' do
-        expect(New.cli).to eq true
+        expect(New.class_var(:cli)).to eq true
       end
 
       it 'should load Newfiles and sources once' do
@@ -118,7 +195,7 @@ describe New::Cli do
 
     context 'when bumping a patch version' do
       before do
-        allow(A).to receive(:sk).and_yield 'p'
+        allow(A).to receive(:sk).and_yield('p')
         @cli.release
       end
 
@@ -129,7 +206,7 @@ describe New::Cli do
 
     context 'when bumping a minor version' do
       before do
-        allow(A).to receive(:sk).and_yield 'm'
+        allow(A).to receive(:sk).and_yield('m')
         @cli.release
       end
 
@@ -140,7 +217,7 @@ describe New::Cli do
 
     context 'when bumping a major version' do
       before do
-        allow(A).to receive(:sk).and_yield 'M'
+        allow(A).to receive(:sk).and_yield('M')
         @cli.release
       end
 
@@ -166,11 +243,12 @@ describe New::Cli do
     end
   end
 
-  describe.skip '#test' do
+  describe '#test' do
     before do
       dbl = double
       allow(dbl).to receive(:start)
-      allow_any_instance_of(New::Cli).to receive(:sleep)
+      allow(Kernel).to receive(:system)
+      allow(Kernel).to receive(:sleep)
       allow(Listen).to receive(:to).and_return dbl
       allow(New).to receive(:load_newfiles)
 
@@ -180,17 +258,22 @@ describe New::Cli do
         }
       }
 
+      @cli.options = {
+        'watch' => true
+      }
+
       @cli.test
     end
 
     after do
-      allow_any_instance_of(New::Cli).to receive(:sleep).and_call_original
+      allow(Kernel).to receive(:system).and_call_original
+      allow(Kernel).to receive(:sleep).and_call_original
       allow(Listen).to receive(:to).and_call_original
       allow(New).to receive(:load_newfiles).and_call_original
     end
 
     it 'should run rspec with task paths' do
-      expect(Listen).to have_received(:to).with root('spec', 'fixtures')
+      expect(Listen).to have_received(:to).with root('spec', 'fixtures', 'source', 'task')
     end
   end
 end

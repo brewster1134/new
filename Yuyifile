@@ -4,5 +4,4 @@ rolls:
   bundler:
   ruby:
     versions:
-      - 1.9.3-p551
       - 2.2.0

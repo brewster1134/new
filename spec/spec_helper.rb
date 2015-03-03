@@ -87,23 +87,32 @@ RSpec.configure do |config|
   end
 
   config.before :suite do
-    require root('spec', 'fixtures', 'task', 'task_task')
-    FileUtils.mkdir_p root('tmp')
-  end
-
-  config.after :suite do
-    FileUtils.rm_rf root('tmp')
+    require root('spec', 'fixtures', 'source', 'task', 'task_task')
   end
 
   config.before do
-    stub_const 'New::HOME_DIRECTORY', root('tmp')
+    stub_const 'New::HOME_DIRECTORY', root('spec', 'fixtures', 'home')
+    stub_const 'New::PROJECT_DIRECTORY', root('spec', 'fixtures', 'project')
 
-    allow(A).to receive(:sk)
-    allow(S).to receive(:ay)
+
+    # load spec Newfiles once
+    New.load_newfiles
+
+    # remove default source for testing
+    New.new_object[:sources].delete(:default)
+
+    # load sources once
+    New::Source.load_sources
+
+    # prevent newfiles and sources from being loaded again
+    allow(New).to receive(:load_newfiles)
+    allow(New::Source).to receive(:load_sources)
+
+    allow(S).to receive(:ay)#.and_call_original
+    allow(A).to receive(:sk).and_call_original
   end
 
   config.after do
-    allow(A).to receive(:sk).and_call_original
     allow(S).to receive(:ay).and_call_original
   end
 end
