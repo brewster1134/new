@@ -63,7 +63,7 @@ describe New::Cli do
         @cli.init
         pn = @project_newfile[]
 
-        expect(pn).to include "tasks:\n  array:\n  - 1\n  - 2"
+        expect(pn).to include "tasks:\n  task:\n    array:\n    - 1\n    - 2"
       end
 
       context 'when required' do
@@ -83,7 +83,7 @@ describe New::Cli do
           @cli.init
           pn = @project_newfile[]
 
-          expect(pn).to include "tasks:\n  array:\n  - foo"
+          expect(pn).to include "tasks:\n  task:\n    array:\n    - foo"
         end
       end
 
@@ -100,7 +100,7 @@ describe New::Cli do
           @cli.init
           pn = @project_newfile[]
 
-          expect(pn).to include "tasks:\n  array: []"
+          expect(pn).to include "tasks:\n  task:\n    array: []"
         end
       end
     end
@@ -118,7 +118,7 @@ describe New::Cli do
         @cli.init
         pn = @project_newfile[]
 
-        expect(pn).to include "tasks:\n  hash:\n    foo: baz\n    bar: baz"
+        expect(pn).to include "tasks:\n  task:\n    hash:\n      foo: baz\n      bar: baz"
       end
     end
 
@@ -138,7 +138,7 @@ describe New::Cli do
         @cli.init
         pn = @project_newfile[]
 
-        expect(pn).to include "tasks:\n  hash:\n    foo: 1\n    bar: 1"
+        expect(pn).to include "tasks:\n  task:\n    hash:\n      foo: 1\n      bar: 1"
       end
     end
   end

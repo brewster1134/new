@@ -70,18 +70,28 @@ class New
 
 private
 
-    def initialize version
-      # load newfiles and sources
-      New.load_newfiles unless @@cli
-      New::Source.load_sources
+  def initialize version
+    # load newfiles and sources
+    New.load_newfiles unless @@cli
+    New::Source.load_sources
 
-      # update options with new version
-      New.new_object = { :version => version }
+    # update options with new version
+    New.new_object = { :version => version }
 
-      # run all tasks
-      New.new_object[:tasks].each do |task_name, task_options|
-        task = New::Source.find_task task_name, task_options.delete(:source).to_sym
-        task.run
-      end
+    # run all tasks
+    New.new_object[:tasks].each do |task_name, task_options|
+      task = New::Source.find_task task_name, task_options.delete(:source).to_sym
+
+      # collect options
+      options = @@new_object.dup
+      options.delete(:sources)
+      options.delete(:tasks)
+      options[:task_options] = task_options
+
+      puts options.inspect
+
+      # run task
+      task.run options
     end
+  end
 end

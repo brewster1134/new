@@ -58,6 +58,6 @@ class New::TaskTask < New::Task
     }
   }
 
-  def run
+  def run options
   end
 end
