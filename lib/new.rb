@@ -88,8 +88,6 @@ private
       options.delete(:tasks)
       options[:task_options] = task_options
 
-      puts options.inspect
-
       # run task
       task.run options
     end

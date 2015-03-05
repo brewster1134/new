@@ -110,11 +110,11 @@ class New::Cli < Thor
         if default
           default = case default
           when Array then default.join(', ')
-          when Hash then pp(default)
+          when Hash then default
           else default.to_s
           end
 
-          S.ay 'Defaults to: ', :newline => false, :indent => 2
+          S.ay 'default: ', :newline => false, :indent => 4
           S.ay default, :highlight_value
         end
 
@@ -139,33 +139,14 @@ class New::Cli < Thor
 
         # collect hash option type values
         when option_settings[:type] == Hash
-          option_value = {}
-
           # get the expected key names from either an Array or Hash
           option_keys = (option_settings[:validation].keys rescue option_settings[:validation]) || []
 
           # loop through the expected keys from the validation and get users input
-          option_keys.each do |key|
-            klass = option_settings[:validation][key] rescue nil
-
-            until option_value[key]
-              if klass == Array
-                S.ay "#{option_name}: #{key}", :preset => :highlight_value, :newline => false
-                option_value[key] = get_array_from_user(option_name)
-              else
-                A.sk "#{option_name}: #{key}", :preset => :prompt do |response|
-
-                  # validate individual hash value
-                  option_response = if klass
-                    New::Task.validate_class(response, klass) rescue nil
-                  else
-                    response
-                  end
-
-                  option_value[key] = option_response
-                end
-              end
-            end
+          option_value = nil
+          until option_value
+            option_value = get_hash_from_user(*option_keys)
+            option_value = task.validate_option(option_name, option_value) rescue nil
           end
 
         # collect non array/hash option type value
@@ -335,7 +316,7 @@ class New::Cli < Thor
 
       # add to the array until an empty string is entered
       until user_response == ''
-        A.sk user_array.join(', '), :preset => :prompt do |response|
+        A.sk user_array.compact.join(', '), :preset => :prompt do |response|
 
           # if the option is valid, pass through the empty string to end entering values
           if response.empty?
@@ -349,6 +330,36 @@ class New::Cli < Thor
       end
 
       return user_array.compact
+    end
+
+    def get_hash_from_user *keys
+      user_response = nil
+      user_hash = {}
+
+      keys.each do |key|
+        A.sk key.to_s, :prompt do |response|
+          user_hash[key] = response
+          S.ay user_hash
+        end
+      end
+
+      until user_response == ''
+        A.sk 'Enter a KEY name', :prompt do |key_response|
+          # exit loop if user is done entering info
+          if key_response == ''
+            user_response = ''
+            next
+          end
+
+          A.sk "Enter a VALUE for `#{key_response}`", :prompt do |value_response|
+            user_hash[key_response.to_sym] = value_response
+            S.ay user_hash
+          end
+        end
+
+      end
+
+      return user_hash
     end
   end
 

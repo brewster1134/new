@@ -105,40 +105,68 @@ describe New::Cli do
       end
     end
 
-    context 'with hash option (with array validation)' do
-      it 'should ask for multiple hash values' do
-        allow(A).to receive(:sk).and_yield('baz')
+    context 'with hash option' do
+      it 'should ask for keys and values' do
+        responses = ['foo', 'FOO', 'bar', 'BAR', '']
+        allow(A).to receive(:sk) do |text, options, &block|
+          block.call responses.shift
+        end
+
         New::Task.tasks[:task].instance_var :options, {
           :hash => {
             :description => 'Hash',
-            :type => Hash,
-            :validation => [:foo, :bar]
+            :type => Hash
           }
         }
         @cli.init
         pn = @project_newfile[]
 
-        expect(pn).to include "tasks:\n  task:\n    hash:\n      foo: baz\n      bar: baz"
+        expect(pn).to include "tasks:\n  task:\n    hash:\n      foo: FOO\n      bar: BAR"
       end
-    end
 
-    context 'with hash option (with hash validation)' do
-      it 'should ask for multiple hash values' do
-        allow(A).to receive(:sk).and_yield('1')
-        New::Task.tasks[:task].instance_var :options, {
-          :hash => {
-            :description => 'Hash',
-            :type => Hash,
-            :validation => {
-              :foo => Integer,
-              :bar => Integer
+      context 'with array validation' do
+        it 'should ask for multiple hash values' do
+          responses = ['FOO', 'BAR', '']
+          allow(A).to receive(:sk) do |text, options, &block|
+            block.call responses.shift
+          end
+
+          New::Task.tasks[:task].instance_var :options, {
+            :hash => {
+              :description => 'Hash',
+              :type => Hash,
+              :validation => [:foo, :bar]
             }
           }
-        }
-        @cli.init
-        pn = @project_newfile[]
+          @cli.init
+          pn = @project_newfile[]
 
-        expect(pn).to include "tasks:\n  task:\n    hash:\n      foo: 1\n      bar: 1"
+          expect(pn).to include "tasks:\n  task:\n    hash:\n      foo: FOO\n      bar: BAR"
+        end
+      end
+
+      context 'with hash validation' do
+        it 'should ask for multiple hash values' do
+          responses = ['FOO', 'BAR', '', '1', '2', '']
+          allow(A).to receive(:sk) do |text, options, &block|
+            block.call responses.shift
+          end
+
+          New::Task.tasks[:task].instance_var :options, {
+            :hash => {
+              :description => 'Hash',
+              :type => Hash,
+              :validation => {
+                :foo => Integer,
+                :bar => Integer
+              }
+            }
+          }
+          @cli.init
+          pn = @project_newfile[]
+
+          expect(pn).to include "tasks:\n  task:\n    hash:\n      foo: 1\n      bar: 2"
+        end
       end
     end
   end
