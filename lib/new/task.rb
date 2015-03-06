@@ -52,18 +52,12 @@ class New::Task
   # @return a valid option value depending on the type/validation rules
   #         if no valid value can be made, return nil
   def validate_option option_name, value
-    original_value = value
-
     # validate supported options
     unless option = options[option_name]
       raise_error option_name, 'is not a supported option'
     end
 
-    # set default
-    type = option[:type] || String
-
-
-    # validate required options or set defaults
+    # validate required option or set default
     if !value || value.empty?
       # if the option is required, raise an error
       if option[:required]
@@ -74,6 +68,9 @@ class New::Task
         value = option[:default]
       end
     end
+
+    # set default
+    type = option[:type] || String
 
     # validate and convert value to specified type
     value = New::Task.validate_class value, type
@@ -154,29 +151,23 @@ private
     @path = path
   end
 
-  #
-  # VALIDATION VALIDATION METHODS... so meta
-  #
-
   # check that a value matches a regexp
   #
   # @param option_name [Symbol] the task option name
   # @param value [String] the passed user value
   # @param regexp [Regexp] a regular expression object. defaults to `.*`
-  # @return
   #
   def validate_regexp option_name, value, regexp
     return value unless regexp
 
-    unless regexp.is_a? Regexp
-      raise_error option_name, 'validation must be a `Regexp`'
-    end
+    # validate validation
+    raise_error option_name, 'validation must be a `Regexp`' unless regexp.is_a? Regexp
 
     # check if the value still exists after comparing to the regexp
     if value[regexp]
       return value
     else
-      raise_error option_name, "`#{value}` did not match the regexp validation."
+      raise_error option_name, "`#{value}` did not match the regexp `#{regexp.to_s.sub('(?-mix:', '').sub(/\)$/, '')}`."
     end
   end
 
@@ -184,14 +175,13 @@ private
     # if no range is set... any value is valid
     return value unless range
 
-    unless range.is_a? Range
-      raise_error option_name, 'validation must be a `Range`'
-    end
+    # validate validation
+    raise_error option_name, 'validation must be a `Range`' unless range.is_a? Range
 
     if range.include? value
       return value
     else
-      raise_error option_name, "`#{value}` is out of range"
+      raise_error option_name, "`#{value}` must be within `#{range.min}` and `#{range.max}`"
     end
   end
 

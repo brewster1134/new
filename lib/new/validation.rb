@@ -38,11 +38,11 @@ private
   end
 
   def validate_boolean value
-    case value
-    when 'true' then true
-    when 'false' then false
+    case value.downcase
+    when 'true', 'yes' then true
+    when 'false', 'no' then false
     else
-      S.ay "`#{value}` must be either `true` or `false`", :fail
+      S.ay "`#{value}` must be either `true/yes` or `false/no`", :fail
       raise
     end
   end

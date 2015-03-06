@@ -38,10 +38,10 @@ class New::Cli < Thor
     version = Semantic::Version.new(@options['version']) rescue nil
     until !version.to_s.empty?
       begin
-        response = A.sk 'Current Version:', :prompt
+        response = A.sk 'Current Project Version:', :prompt
         version = Semantic::Version.new response
       rescue
-        S.ay "`#{response}` is not a valid semantic version", :fail
+        S.ay "`#{response}` is not a valid semantic version (e.g. 1.2.3)", :fail
       end
     end
     newfile_object[:version] = version.to_s
@@ -60,8 +60,10 @@ class New::Cli < Thor
       S.ay
       self.tasks :show_source => true, :load_newfiles => false, :load_sources => false
 
-      S.ay 'Enter tasks one at a time in the order you want them to run'
-      S.ay 'To finish, press enter with nothing entered'
+      S.ay 'Add multiple tasks by pressing ENTER after each one'
+      S.ay 'Enter tasks in the order you want them to run', :preset => :warn, :indent => 2
+      S.ay 'Enter both the source and the task (e.g. source#task)', :preset => :warn, :indent => 2
+      S.ay 'Enter an empty value to finish', :preset => :warn, :indent => 2
 
       added_task = nil
       until added_task == '' && !tasks_list.empty?
@@ -96,7 +98,7 @@ class New::Cli < Thor
     S.ay
 
     tasks_list.each do |task|
-      S.ay 'Set options for: ', :newline => false, :preset => :highlight_key
+      S.ay 'OK, now lets set options for ', :newline => false, :preset => :highlight_key
       S.ay task.name.to_s, :highlight_value
       S.ay
 
@@ -107,7 +109,7 @@ class New::Cli < Thor
 
         # show default
         default = option_settings[:default]
-        if default
+        if default && !option_settings[:required]
           default = case default
           when Array then default.join(', ')
           when Hash then default
@@ -118,14 +120,13 @@ class New::Cli < Thor
           S.ay default, :highlight_value
         end
 
-        option_value = nil
-
         # GET USER INPUT FOR ARRAY TYPE
         #
+        task_type = option_settings[:type]
         case
 
         # collect array option type values
-        when option_settings[:type] == Array
+        when task_type == Array
           # cast type onto all user input values (default is String)
           klass = option_settings[:validation] || String
 
@@ -137,7 +138,7 @@ class New::Cli < Thor
           end
 
         # collect hash option type values
-        when option_settings[:type] == Hash
+        when task_type == Hash
           # get the expected key names from either an Array or Hash
           option_keys = (option_settings[:validation].keys rescue option_settings[:validation]) || []
 
@@ -213,20 +214,26 @@ class New::Cli < Thor
     New.load_newfiles
 
     version = Semantic::Version.new New.new_object[:version]
+    version_bump_part = nil
 
     # request the version to bump
     S.ay "           Current Version: #{version.to_s.green}", type: :success
-    A.sk "  What do you want to bump: [#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)" do |response|
-      case response
-      when 'M'
-        version.major += 1
-        version.minor = 0
-        version.patch = 0
-      when 'm'
-        version.minor += 1
-        version.patch = 0
-      when 'p'
-        version.patch += 1
+    until version_bump_part
+      A.sk "  What do you want to bump: [#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)" do |response|
+        version_bump_part = case response
+        when 'M'
+          version.major += 1
+          version.minor = 0
+          version.patch = 0
+        when 'm'
+          version.minor += 1
+          version.patch = 0
+        when 'p'
+          version.patch += 1
+        else
+          S.ay 'You must choose from [Mmp]', :fail
+          nil
+        end
       end
     end
     S.ay "               New Version: #{version.to_s.green}", type: :success
@@ -310,7 +317,8 @@ class New::Cli < Thor
 
   no_commands do
     def get_array_from_user klass
-      S.ay 'Add multiple values by pressing ENTER after each one. Enter an empty value to finish.'
+      S.ay 'Add multiple values by pressing ENTER after each one'
+      S.ay 'Enter an empty value to finish', :preset => :warn, :indent => 2
 
       user_array = []
       user_response = nil
@@ -343,6 +351,10 @@ class New::Cli < Thor
           S.ay user_hash
         end
       end
+
+      S.ay
+      S.ay 'Add multiple key/value pairs by pressing ENTER after each one'
+      S.ay 'Enter an empty value for a key to finish', :preset => :warn, :indent => 2
 
       until user_response == ''
         A.sk 'Enter a KEY name', :prompt do |key_response|
