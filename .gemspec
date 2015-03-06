@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
   s.executables = ["new"]
   s.bindir = 'bin'
   s.name = 'new'
-  s.version = '1.0.2'
+  s.version = '1.0.3'
   s.date = '2015-03-05'
   s.summary = 'A flexible tool for releasing your code into the wild'
   s.files = ["bin/new", "lib/new/cli.rb", "lib/new/source.rb", "lib/new/task.rb", "lib/new/validation.rb", "lib/new.rb", "Gemfile"]

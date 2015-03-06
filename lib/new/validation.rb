@@ -32,7 +32,7 @@ private
       raise if symbol_name.empty?
       symbol_name
     rescue
-      S.ay "`#{value}` could not be converted into a proper symbol (Check the New docs for the requirements)", :fail
+      S.ay "`#{value}` could not be converted into a proper symbol (Check the New docs for rules)", :fail
       raise
     end
   end

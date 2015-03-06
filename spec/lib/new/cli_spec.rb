@@ -147,7 +147,7 @@ describe New::Cli do
 
       context 'with hash validation' do
         it 'should ask for multiple hash values' do
-          responses = ['FOO', 'BAR', '', '1', '2', '']
+          responses = ['FOO', '1', 'BAR', '2', '']
           allow(A).to receive(:sk) do |text, options, &block|
             block.call responses.shift
           end

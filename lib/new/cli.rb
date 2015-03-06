@@ -139,13 +139,10 @@ class New::Cli < Thor
 
         # collect hash option type values
         when task_type == Hash
-          # get the expected key names from either an Array or Hash
-          option_keys = (option_settings[:validation].keys rescue option_settings[:validation]) || []
-
           # loop through the expected keys from the validation and get users input
           option_value = nil
           until option_value
-            option_value = get_hash_from_user(*option_keys)
+            option_value = get_hash_from_user(option_settings[:validation])
             option_value = task.validate_option(option_name, option_value) rescue nil
           end
 
@@ -341,35 +338,72 @@ class New::Cli < Thor
       return user_array.compact
     end
 
-    def get_hash_from_user *keys
+    def get_hash_from_user validation = {}
+      # start to build the hash of user values
       user_hash = {}
-      user_response = nil
 
-      keys.each do |key|
-        A.sk "Enter a VALUE for `#{key}`", :prompt do |response|
-          user_hash[key] = response
-          S.ay user_hash
+      # make sure validation exists as a hash of keys and klass values
+      validation = case validation
+      when nil then {}
+      when Hash then validation
+      when Array
+        validation_hash = {}
+        validation.each do |e|
+          validation_hash[e] = String
+        end
+        validation_hash
+      end
+
+      # get user values for required validation keys
+      validation.each do |key, klass|
+        user_response = nil
+        until user_response
+          A.sk "Enter a VALUE for `#{key}`", :prompt do |response|
+            # make sure validation keys have a value
+            if response == ''
+              user_response = nil
+              next
+            end
+
+            user_response = New::Task.validate_class(response, klass) rescue nil
+
+            unless user_response.nil?
+              user_hash[key] = user_response
+              S.ay user_hash
+            end
+          end
         end
       end
 
+      # Allow users to enter custom keys AND values
       S.ay
       S.ay 'Add multiple key/value pairs by pressing ENTER after each one'
       S.ay 'Enter an empty value for a key to finish', :preset => :warn, :indent => 2
 
-      until user_response == ''
+      user_key_response = nil
+      until user_key_response == ''
         A.sk 'Enter a KEY name', :prompt do |key_response|
           # exit loop if user is done entering info
           if key_response == ''
-            user_response = ''
+            user_key_response = ''
             next
           end
 
-          A.sk "Enter a VALUE for `#{key_response}`", :prompt do |value_response|
-            user_hash[key_response.to_sym] = value_response
-            S.ay user_hash
+          user_value_response = nil
+          until user_value_response
+            A.sk "Enter a VALUE for `#{key_response}`", :prompt do |value_response|
+              # make sure value exists for user created key
+              if value_response == ''
+                user_value_response = nil
+                next
+              end
+
+              # create key/value pair
+              user_hash[key_response.to_sym] = user_value_response = value_response
+              S.ay user_hash
+            end
           end
         end
-
       end
 
       return user_hash
