@@ -4,7 +4,7 @@ sources:
   local: ~/Code/ruby/new-tasks
   spec: ~/Code/ruby/new/spec/fixtures/source
 name: New
-version: 1.0.0
+version: 1.0.1
 tasks:
   gem:
     name: new

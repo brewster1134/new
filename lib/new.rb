@@ -93,9 +93,11 @@ private
       task.run options
     end
 
-    # write new Newfile
+    # write new Newfile with new version
+    new_newfile = YAML.load(File.read(File.join(PROJECT_DIRECTORY, NEWFILE_NAME)))
+    new_newfile['version'] = version
     File.open File.join(PROJECT_DIRECTORY, NEWFILE_NAME), 'w+' do |f|
-      f.write @@new_object.deep_stringify_keys.to_yaml
+      f.write new_newfile.to_yaml
     end
   end
 end
