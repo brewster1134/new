@@ -114,7 +114,7 @@ class New::Cli < Thor
           else default.to_s
           end
 
-          S.ay 'default: ', :newline => false, :indent => 4
+          S.ay 'default: ', :newline => false, :indent => 2
           S.ay default, :highlight_value
         end
 
@@ -132,7 +132,6 @@ class New::Cli < Thor
           # collect array elements from the user
           option_value = nil
           until option_value
-            S.ay option_name.to_s, :preset => :highlight_value, :newline => false
             option_value = get_array_from_user(klass)
             option_value = task.validate_option(option_name, option_value) rescue nil
           end
@@ -153,7 +152,7 @@ class New::Cli < Thor
         else
           option_value = nil
           until option_value
-            A.sk option_name.to_s, :preset => :prompt do |response|
+            A.sk '', :newline => false, :preset => :prompt do |response|
               option_value = task.validate_option(option_name, response) rescue nil
             end
           end
@@ -311,6 +310,8 @@ class New::Cli < Thor
 
   no_commands do
     def get_array_from_user klass
+      S.ay 'Add multiple values by pressing ENTER after each one. Enter an empty value to finish.'
+
       user_array = []
       user_response = nil
 
@@ -333,11 +334,11 @@ class New::Cli < Thor
     end
 
     def get_hash_from_user *keys
-      user_response = nil
       user_hash = {}
+      user_response = nil
 
       keys.each do |key|
-        A.sk key.to_s, :prompt do |response|
+        A.sk "Enter a VALUE for `#{key}`", :prompt do |response|
           user_hash[key] = response
           S.ay user_hash
         end

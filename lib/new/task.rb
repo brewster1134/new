@@ -56,7 +56,7 @@ class New::Task
 
     # validate supported options
     unless option = options[option_name]
-      raise_error option_name, "`#{option_name}` is not a supported option"
+      raise_error option_name, 'is not a supported option'
     end
 
     # set default
@@ -67,7 +67,7 @@ class New::Task
     if !value || value.empty?
       # if the option is required, raise an error
       if option[:required]
-        raise_error option_name, "`#{option_name}` is a required option"
+        raise_error option_name, 'is a required option'
 
       # otherwise set the default
       elsif option[:default]
@@ -98,7 +98,7 @@ class New::Task
         validation = validation || String
 
         unless validation == String || validation == Symbol || validation == Boolean || validation == Integer || validation == Float
-          raise_error option_name, "The validation must be a [String|Symbol|Boolean|Integer|Float]"
+          raise_error option_name, "validation must be a [String|Symbol|Boolean|Integer|Float]"
         end
 
         # validate each element in array with the validation class type
@@ -110,14 +110,14 @@ class New::Task
 
       when type == Hash
         unless validation.is_a?(Array) || validation.is_a?(Hash)
-          raise_error option_name, "The validation must be an Array or Hash of required keys (Check the New docs for the requirements)"
+          raise_error option_name, "validation must be an Array or Hash of required keys (Check the New docs for the requirements)"
         end
 
         # make sure value contains all the required validation keys
         value_keys = (value.is_a?(Array) ? value : value.keys).map(&:to_sym)
         validation_keys = (validation.is_a?(Array) ? validation : validation.keys).map(&:to_sym)
         unless (validation_keys & value_keys) == validation_keys
-          raise_error option_name, "The value must contain all the following keys: #{validation_keys.join(', ')}"
+          raise_error option_name, "must contain all the following keys: #{validation_keys.join(', ')}"
         end
 
         # make sure values are of the provided class type
@@ -169,7 +169,7 @@ private
     return value unless regexp
 
     unless regexp.is_a? Regexp
-      raise_error option_name, 'The validation must be a `Regexp`'
+      raise_error option_name, 'validation must be a `Regexp`'
     end
 
     # check if the value still exists after comparing to the regexp
@@ -185,7 +185,7 @@ private
     return value unless range
 
     unless range.is_a? Range
-      raise_error option_name, 'The validation must be a `Range`'
+      raise_error option_name, 'validation must be a `Range`'
     end
 
     if range.include? value
@@ -196,9 +196,9 @@ private
   end
 
   def raise_error option_name, message
-    S.ay "#{@name.to_s.upcase}: ", :newline => false, :style => :bold
-    S.ay "#{option_name}: ", :newline => false
-    S.ay message.to_s, :fail
+    S.ay "#{@name.to_s.upcase}: ", :preset => :fail, :newline => false, :style => :bold
+    S.ay option_name.to_s, :preset => :fail, :newline => false, :style => [:bold, :underline]
+    S.ay message.to_s, :preset => :fail, :indent => 1
     raise
   end
 end
