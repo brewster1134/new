@@ -112,7 +112,7 @@ class New::Cli < Thor
         if default && !option_settings[:required]
           default = case default
           when Array then default.join(', ')
-          when Hash then default
+          when Hash then default.keys.join(', ')
           else default.to_s
           end
 
