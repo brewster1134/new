@@ -76,11 +76,12 @@ private
     New::Source.load_sources
 
     # update options with new version
-    New.new_object = { :version => version }
+    @@new_object[:version] = version
 
     # run all tasks
-    New.new_object[:tasks].each do |task_name, task_options|
-      task = New::Source.find_task task_name, task_options.delete(:source).to_sym
+    @@new_object[:tasks].each do |task_name, task_options|
+      task_options = task_options.dup
+      task = New::Source.find_task task_name, task_options.delete(:source)
 
       # collect options
       options = @@new_object.dup
@@ -90,6 +91,11 @@ private
 
       # run task
       task.run options
+    end
+
+    # write new Newfile
+    File.open File.join(PROJECT_DIRECTORY, NEWFILE_NAME), 'w+' do |f|
+      f.write @@new_object.deep_stringify_keys.to_yaml
     end
   end
 end

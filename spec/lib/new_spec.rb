@@ -1,4 +1,12 @@
 describe New do
+  before do
+    allow(File).to receive(:open)
+  end
+
+  after do
+    allow(File).to receive(:open).and_call_original
+  end
+
   # Newfiles are preloaded in spec_helper
   #
   describe '.load_newfiles' do
@@ -49,11 +57,15 @@ describe New do
     end
 
     it 'should lookup task from source' do
-      expect(New::Source).to have_received(:find_task).with :task, :spec
+      expect(New::Source).to have_received(:find_task).with :task, 'spec'
     end
 
     it 'should call run on tasks' do
       expect(@task).to have_received(:run)
+    end
+
+    it 'shouldnt modify the original new object' do
+      expect(New.new_object[:tasks][:task][:source]).to eq 'spec'
     end
   end
 end
