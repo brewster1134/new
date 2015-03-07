@@ -133,8 +133,12 @@ class New::Cli < Thor
           # collect array elements from the user
           option_value = nil
           until option_value
-            option_value = get_array_from_user(klass)
-            option_value = task.validate_option(option_name, option_value) rescue nil
+            begin
+              option_value = get_array_from_user(klass)
+              option_value = task.validate_option(option_name, option_value)
+            rescue
+              option_value = nil
+            end
           end
 
         # collect hash option type values
@@ -142,8 +146,12 @@ class New::Cli < Thor
           # loop through the expected keys from the validation and get users input
           option_value = nil
           until option_value
-            option_value = get_hash_from_user(option_settings[:validation])
-            option_value = task.validate_option(option_name, option_value) rescue nil
+            begin
+              option_value = get_hash_from_user(option_settings[:validation])
+              option_value = task.validate_option(option_name, option_value)
+            rescue
+              option_value = nil
+            end
           end
 
         # collect non array/hash option type value
@@ -166,6 +174,12 @@ class New::Cli < Thor
     File.open project_newfile, 'w+' do |f|
       f.write newfile_object.deep_stringify_keys.to_yaml
     end
+
+    # Success Message
+    S.ay "A `#{'Newfile'.green}` was successfully created for your project `#{name.to_s.green}`"
+    S.ay 'Double check the values are correct, and make any neccessar modifications.', :indent => 2
+    S.ay "You are now ready to run `#{'new release'.green}` to release your software into the wild!", :indent => 2
+    S.ay
   end
 
   desc 'tasks', 'List all available tasks'
@@ -358,6 +372,14 @@ class New::Cli < Thor
       validation.each do |key, klass|
         user_response = nil
         until user_response
+
+          # do not allow nested arrays/hashes
+          # these should be declared as their own option
+          if klass == Array || klass == Hash
+            S.ay 'Hash options cannot have nested Arrays or Hashes.  They should be declared as their own option.', :fail
+            exit
+          end
+
           A.sk "Enter a VALUE for `#{key}`", :prompt do |response|
             # make sure validation keys have a value
             if response == ''
@@ -365,11 +387,12 @@ class New::Cli < Thor
               next
             end
 
-            user_response = New::Task.validate_class(response, klass) rescue nil
-
-            unless user_response.nil?
+            begin
+              user_response = New::Task.validate_class(response, klass)
               user_hash[key] = user_response
               S.ay user_hash
+            rescue
+              user_response = nil
             end
           end
         end
