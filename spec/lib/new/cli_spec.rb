@@ -23,6 +23,7 @@ describe New::Cli do
 
   describe '#init' do
     before do
+      allow(A).to receive(:sk).and_yield('foo')
       stub_const 'New::NEWFILE_NAME', 'Newfile_spec'
 
       @cli.options = {
@@ -30,6 +31,10 @@ describe New::Cli do
         'version' => '1.2.3',
         'tasks' => ['spec#task']
       }
+
+      New::Task.tasks[:task].instance_var :options, {:foo => {}}
+      @cli.init
+      @pn = @project_newfile[]
     end
 
     after do
@@ -37,137 +42,10 @@ describe New::Cli do
       stub_const 'New::NEWFILE_NAME', 'Newfile'
     end
 
-    it 'should write the name and version' do
-      New::Task.tasks[:task].instance_var :options, {}
-      @cli.init
-      pn = @project_newfile[]
-
-      expect(pn).to include 'name: Foo Name'
-      expect(pn).to include 'version: 1.2.3'
-    end
-
-    context 'with array option' do
-      it 'should ask for multiple array values' do
-        responses = ['1', 'foo', '2', '']
-        allow(A).to receive(:sk) do |text, options, &block|
-          block.call responses.shift
-        end
-
-        New::Task.tasks[:task].instance_var :options, {
-          :array => {
-            :description => 'Array',
-            :type => Array,
-            :validation => Integer
-          }
-        }
-        @cli.init
-        pn = @project_newfile[]
-
-        expect(pn).to include "tasks:\n  task:\n    array:\n    - 1\n    - 2"
-      end
-
-      context 'when required' do
-        it 'should not allow an empty array' do
-          responses = ['', 'foo', '']
-          allow(A).to receive(:sk) do |text, &block|
-            block.call responses.shift
-          end
-
-          New::Task.tasks[:task].instance_var :options, {
-            :array => {
-              :description => 'Array',
-              :required => true,
-              :type => Array
-            }
-          }
-          @cli.init
-          pn = @project_newfile[]
-
-          expect(pn).to include "tasks:\n  task:\n    array:\n    - foo"
-        end
-      end
-
-      context 'when not required' do
-        it 'should allow an empty array' do
-          allow(A).to receive(:sk).and_yield('')
-          New::Task.tasks[:task].instance_var :options, {
-            :array => {
-              :description => 'Array',
-              :required => false,
-              :type => Array
-            }
-          }
-          @cli.init
-          pn = @project_newfile[]
-
-          expect(pn).to include "tasks:\n  task:\n    array: []"
-        end
-      end
-    end
-
-    context 'with hash option' do
-      it 'should ask for keys and values' do
-        responses = ['foo', 'FOO', 'bar', 'BAR', '']
-        allow(A).to receive(:sk) do |text, options, &block|
-          block.call responses.shift
-        end
-
-        New::Task.tasks[:task].instance_var :options, {
-          :hash => {
-            :description => 'Hash',
-            :type => Hash
-          }
-        }
-        @cli.init
-        pn = @project_newfile[]
-
-        expect(pn).to include "tasks:\n  task:\n    hash:\n      foo: FOO\n      bar: BAR"
-      end
-
-      context 'with array validation' do
-        it 'should ask for multiple hash values' do
-          responses = ['FOO', 'BAR', '']
-          allow(A).to receive(:sk) do |text, options, &block|
-            block.call responses.shift
-          end
-
-          New::Task.tasks[:task].instance_var :options, {
-            :hash => {
-              :description => 'Hash',
-              :type => Hash,
-              :validation => [:foo, :bar]
-            }
-          }
-          @cli.init
-          pn = @project_newfile[]
-
-          expect(pn).to include "tasks:\n  task:\n    hash:\n      foo: FOO\n      bar: BAR"
-        end
-      end
-
-      context 'with hash validation' do
-        it 'should ask for multiple hash values' do
-          responses = ['FOO', '1', 'BAR', '2', '']
-          allow(A).to receive(:sk) do |text, options, &block|
-            block.call responses.shift
-          end
-
-          New::Task.tasks[:task].instance_var :options, {
-            :hash => {
-              :description => 'Hash',
-              :type => Hash,
-              :validation => {
-                :foo => Integer,
-                :bar => Integer
-              }
-            }
-          }
-          @cli.init
-          pn = @project_newfile[]
-
-          expect(pn).to include "tasks:\n  task:\n    hash:\n      foo: 1\n      bar: 2"
-        end
-      end
+    it 'should write to the project Newfile' do
+      expect(@pn).to include 'name: Foo Name'
+      expect(@pn).to include 'version: 1.2.3'
+      expect(@pn).to include "tasks:\n  task:\n    foo: foo"
     end
   end
 
@@ -302,6 +180,80 @@ describe New::Cli do
 
     it 'should run rspec with task paths' do
       expect(Listen).to have_received(:to).with root('spec', 'fixtures', 'source', 'task')
+    end
+  end
+
+  describe '#get_array_from_user' do
+    it 'should prompt for valid values' do
+      responses = ['foo', 'bar', '']
+      allow(A).to receive(:sk) do |text, options, &block|
+        block.call responses.shift
+      end
+
+      user_array = @cli.get_array_from_user
+      expect(user_array).to eq(['foo', 'bar'])
+    end
+
+    it 'should accept a data type' do
+      responses = ['foo', '1', 'bar', '2', '']
+      allow(A).to receive(:sk) do |text, options, &block|
+        block.call responses.shift
+      end
+
+      user_array = @cli.get_array_from_user Integer
+      expect(user_array).to eq([1, 2])
+    end
+  end
+
+  describe '#get_hash_from_user' do
+    context 'with array validation' do
+      it 'should prompt for valid values' do
+        responses = ['FOO', 'BAR', '']
+        allow(A).to receive(:sk) do |text, options, &block|
+          block.call responses.shift
+        end
+
+        user_hash = @cli.get_hash_from_user([:foo, :bar])
+        expect(user_hash).to eq({
+          :foo => 'FOO',
+          :bar => 'BAR'
+        })
+      end
+    end
+
+    context 'with hash validation' do
+      it 'should prompt for valid values' do
+        responses = ['FOO', '1', 'BAR', 'true', '']
+        allow(A).to receive(:sk) do |text, options, &block|
+          block.call responses.shift
+        end
+
+        user_hash = @cli.get_hash_from_user({
+          :foo => Integer,
+          :bar => Boolean
+        })
+
+        expect(user_hash).to eq({
+          :foo => 1,
+          :bar => true
+        })
+      end
+    end
+
+    context 'with user specified key/values' do
+      it 'should prompt for valid values' do
+        responses = ['foo', 'FOO', 'bar', 'BAR', '']
+        allow(A).to receive(:sk) do |text, options, &block|
+          block.call responses.shift
+        end
+
+        user_hash = @cli.get_hash_from_user
+
+        expect(user_hash).to eq({
+          :foo => 'FOO',
+          :bar => 'BAR'
+        })
+      end
     end
   end
 end

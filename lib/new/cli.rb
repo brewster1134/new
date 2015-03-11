@@ -327,7 +327,7 @@ class New::Cli < Thor
   end
 
   no_commands do
-    def get_array_from_user klass
+    def get_array_from_user klass = String
       S.ay 'Add multiple values by pressing ENTER after each one'
       S.ay 'Enter an empty value to finish', :preset => :warn, :indent => 2
 
