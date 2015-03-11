@@ -70,13 +70,14 @@ class New
 
 private
 
-  def initialize version
+  def initialize version, changelog
     # load newfiles and sources
     New.load_newfiles unless @@cli
     New::Source.load_sources
 
-    # update options with new version
+    # update options with new attributes
     @@new_object[:version] = version
+    @@new_object[:changelog] = changelog
 
     # run all tasks
     @@new_object[:tasks].each do |task_name, task_options|

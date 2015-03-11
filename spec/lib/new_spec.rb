@@ -11,7 +11,7 @@ describe New do
   #
   describe '.load_newfiles' do
     it 'should add home & project Newfile symbolized data to global new object' do
-      expect(New.new_object).to eq({
+      expect(New.new_object).to include({
         :name => 'Project Fixture',
         :version => '1.2.3',
         :sources => {
@@ -26,7 +26,7 @@ describe New do
     end
   end
 
-  describe '.cli' do
+  describe '.set_cli' do
     before do
       New.class_var :cli, false
       New.set_cli
@@ -44,7 +44,7 @@ describe New do
       allow(@task).to receive(:run)
       allow(New::Source).to receive(:find_task).and_call_original
 
-      New.new '1.2.4'
+      New.new '1.2.4', ['changelog']
     end
 
     after do
@@ -52,8 +52,9 @@ describe New do
       allow(New::Source).to receive(:find_task).and_call_original
     end
 
-    it 'should add new version' do
+    it 'should add new attributes' do
       expect(New.new_object[:version]).to eq '1.2.4'
+      expect(New.new_object[:changelog]).to eq ['changelog']
     end
 
     it 'should lookup task from source' do
@@ -61,7 +62,12 @@ describe New do
     end
 
     it 'should call run on tasks' do
-      expect(@task).to have_received(:run)
+      expect(@task).to have_received(:run).with({
+        :name => 'Project Fixture',
+        :version => '1.2.4',
+        :changelog => ['changelog'],
+        :task_options => {}
+      })
     end
 
     it 'shouldnt modify the original new object' do

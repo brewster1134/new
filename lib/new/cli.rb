@@ -52,10 +52,10 @@ class New::Cli < Thor
       tasks_list << New::Source.find_task(task)
     end
 
-    # remove any nil tasks in case the user passed an invalid task
+    # remove any empty tasks in case the user specified an invalid task
     tasks_list.compact!
 
-    # if no tasks are specified, show available tasks
+    # if no tasks are specified, show all available tasks
     if tasks_list.empty?
       S.ay
       self.tasks :show_source => true, :load_newfiles => false, :load_sources => false
@@ -249,7 +249,11 @@ class New::Cli < Thor
     end
     S.ay "               New Version: #{version.to_s.green}", type: :success
 
-    New.new version.to_s
+    # collect a list of changes in this version
+    changelog = get_changelog_from_user
+    S.ay
+
+    New.new version.to_s, changelog
   end
 
   desc 'version', 'Show the current version'
@@ -327,8 +331,30 @@ class New::Cli < Thor
   end
 
   no_commands do
+    def get_changelog_from_user
+      S.ay 'Now lets add some items to the changelog'
+      S.ay 'Add multiple entries by pressing ENTER after each one', :preset => :warn, :indent => 2
+      S.ay 'Enter an empty value to finish', :preset => :warn, :indent => 2
+
+      user_changelog = []
+      user_response = nil
+
+      # add entries to the changelog until an empty string is entered
+      until user_response == '' && !user_changelog.empty?
+        A.sk user_changelog.compact.join("\n"), :preset => :prompt do |response|
+          if response.empty?
+            user_response = ''
+            next
+          end
+
+          user_changelog << response
+        end
+      end
+    end
+
     def get_array_from_user klass = String
-      S.ay 'Add multiple values by pressing ENTER after each one'
+      S.ay "We need to collect a list of #{klass}s"
+      S.ay 'Add multiple values by pressing ENTER after each one', :preset => :warn, :indent => 2
       S.ay 'Enter an empty value to finish', :preset => :warn, :indent => 2
 
       user_array = []
@@ -370,6 +396,8 @@ class New::Cli < Thor
 
       # get user values for required validation keys
       validation.each do |key, klass|
+        S.ay 'Now we need to collect some required values'
+
         user_response = nil
         until user_response
 
@@ -399,9 +427,9 @@ class New::Cli < Thor
       end
 
       # Allow users to enter custom keys AND values
-      S.ay
-      S.ay 'Add multiple key/value pairs by pressing ENTER after each one'
-      S.ay 'Enter an empty value for a key to finish', :preset => :warn, :indent => 2
+      S.ay 'Now you can add custom keys & values if you want'
+      S.ay 'Add multiple key/value pairs by pressing ENTER after each one', :preset => :warn, :indent => 2
+      S.ay 'Enter an empty key to finish', :preset => :warn, :indent => 2
 
       user_key_response = nil
       until user_key_response == ''
