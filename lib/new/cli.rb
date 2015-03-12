@@ -220,6 +220,7 @@ class New::Cli < Thor
   end
 
   desc 'release', 'Release a new version of your project'
+  option :skip, :type => :array, :aliases => ['-s'], :default => [], :desc => 'Tasks to skip for this release'
   def release
     New.set_cli
     New.load_newfiles
@@ -228,9 +229,9 @@ class New::Cli < Thor
     version_bump_part = nil
 
     # request the version to bump
-    S.ay "           Current Version: #{version.to_s.green}", type: :success
+    S.ay "  What do you want to bump: [#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)"
     until version_bump_part
-      A.sk "  What do you want to bump: [#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)" do |response|
+      A.sk "           Current Version: #{version.to_s.green}" do |response|
         version_bump_part = case response
         when 'M'
           version.major += 1
@@ -248,12 +249,24 @@ class New::Cli < Thor
       end
     end
     S.ay "               New Version: #{version.to_s.green}", type: :success
+    S.ay
 
     # collect a list of changes in this version
     changelog = get_changelog_from_user
     S.ay
 
-    New.new version.to_s, changelog
+    # show tasks
+    S.ay "#{'Running Tasks:'.green} (in order)", :highlight_value
+    skip_tasks = @options['skip'].map(&:to_sym)
+    New.new_object[:tasks].keys.each do |task|
+      if skip_tasks.include?(task)
+        S.ay "#{task.to_s} (skipped)", :preset => :warn, :indent => 4
+      else
+        S.ay task.to_s, :indent => 2
+      end
+    end
+
+    New.new version.to_s, changelog, @options['skip']
   end
 
   desc 'version', 'Show the current version'

@@ -70,7 +70,7 @@ class New
 
 private
 
-  def initialize version, changelog
+  def initialize version, changelog, *skip_tasks
     # load newfiles and sources
     New.load_newfiles unless @@cli
     New::Source.load_sources
@@ -78,6 +78,11 @@ private
     # update options with new attributes
     @@new_object[:version] = version
     @@new_object[:changelog] = changelog
+
+    # remove skipped tasks
+    skip_tasks.each do |skip|
+      @@new_object[:tasks].delete(skip.to_sym)
+    end
 
     # run all tasks
     @@new_object[:tasks].each do |task_name, task_options|

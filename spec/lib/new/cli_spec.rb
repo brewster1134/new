@@ -3,7 +3,7 @@ require 'tmpdir'
 describe New::Cli do
   before do
     # run all cli commands from a tmp project directory
-    @pwd = FileUtils.pwd
+    @pwd = Dir.pwd
     FileUtils.chdir New::PROJECT_DIRECTORY
 
     # initialize cli instance
@@ -72,6 +72,8 @@ describe New::Cli do
       allow(@cli).to receive(:get_changelog_from_user).and_return(['changelog'])
       allow(New).to receive(:new)
 
+      @cli.options = { 'skip' => [] }
+
       New.new_object = {
         :version => '1.2.3'
       }
@@ -97,7 +99,7 @@ describe New::Cli do
       end
 
       it 'should initialize' do
-        expect(New).to have_received(:new).with '1.2.4', ['changelog']
+        expect(New).to have_received(:new).with '1.2.4', ['changelog'], []
       end
     end
 
@@ -109,7 +111,7 @@ describe New::Cli do
       end
 
       it 'should increment the patch version' do
-        expect(New).to have_received(:new).with '1.2.4', ['changelog']
+        expect(New).to have_received(:new).with '1.2.4', ['changelog'], []
       end
     end
 
@@ -121,7 +123,7 @@ describe New::Cli do
       end
 
       it 'should increment the minor version and set the patch version to 0' do
-        expect(New).to have_received(:new).with '1.3.0', ['changelog']
+        expect(New).to have_received(:new).with '1.3.0', ['changelog'], []
       end
     end
 
@@ -133,7 +135,7 @@ describe New::Cli do
       end
 
       it 'should increment the major version and set the minor & patch versions to 0' do
-        expect(New).to have_received(:new).with '2.0.0', ['changelog']
+        expect(New).to have_received(:new).with '2.0.0', ['changelog'], []
       end
     end
   end
