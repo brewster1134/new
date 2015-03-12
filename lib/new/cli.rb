@@ -225,13 +225,14 @@ class New::Cli < Thor
     New.set_cli
     New.load_newfiles
 
+    # request the version to bump
+    S.ay
+    S.ay "Releasing a new version of: #{New.new_object[:name].green}", :indent => 2
+    S.ay "What do you want to bump: [#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)", :indent => 4
     version = Semantic::Version.new New.new_object[:version]
     version_bump_part = nil
-
-    # request the version to bump
-    S.ay "  What do you want to bump: [#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)"
     until version_bump_part
-      A.sk "           Current Version: #{version.to_s.green}" do |response|
+      A.sk "Current Version: #{version.to_s.green}", :indent => 13 do |response|
         version_bump_part = case response
         when 'M'
           version.major += 1
@@ -248,7 +249,7 @@ class New::Cli < Thor
         end
       end
     end
-    S.ay "               New Version: #{version.to_s.green}", type: :success
+    S.ay "New Version: #{version.to_s.green}", type: :success, :indent => 17
     S.ay
 
     # collect a list of changes in this version
