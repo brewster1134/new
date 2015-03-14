@@ -1,10 +1,21 @@
 describe New do
   before do
+    @task = New::Task.tasks[:task]
+    @task_two = New::Task.tasks[:task_two]
+
+    allow(@task).to receive(:verify)
+    allow(@task).to receive(:run)
+    allow(@task_two).to receive(:verify)
+    allow(@task_two).to receive(:run)
+
     allow(File).to receive(:open)
+    allow(New::Source).to receive(:find_task).and_call_original
   end
 
   after do
     allow(File).to receive(:open).and_call_original
+    allow(@task).to receive(:run).and_call_original
+    allow(@task_two).to receive(:run).and_call_original
   end
 
   # Newfiles are preloaded in spec_helper
@@ -19,6 +30,9 @@ describe New do
         },
         :tasks => {
           :task => {
+            :source => 'spec'
+          },
+          :task_two => {
             :source => 'spec'
           }
         }
@@ -40,17 +54,7 @@ describe New do
   describe '#initialize' do
     context 'with all tasks' do
       before do
-        @task = New::Task.tasks[:task]
-
-        allow(@task).to receive(:run)
-        allow(New::Source).to receive(:find_task).and_call_original
-
         New.new '1.2.4', ['changelog']
-      end
-
-      after do
-        allow(@task).to receive(:run).and_call_original
-        allow(New::Source).to receive(:find_task).and_call_original
       end
 
       it 'should add new attributes' do
@@ -74,20 +78,23 @@ describe New do
       it 'shouldnt modify the original new object' do
         expect(New.new_object[:tasks][:task][:source]).to eq 'spec'
       end
+
+      it 'should run verify before run' do
+        expect(@task).to have_received(:verify).ordered
+        expect(@task_two).to have_received(:verify).ordered
+        expect(@task).to have_received(:run).ordered
+        expect(@task_two).to have_received(:run).ordered
+      end
     end
 
     context 'when skipping tasks' do
       before do
-        @task = New::Task.tasks[:task]
-
-        allow(@task).to receive(:run)
-        allow(New::Source).to receive(:find_task).and_call_original
-
         New.new '1.2.4', ['changelog'], 'task'
       end
 
       it 'should skip task' do
         expect(@task).to_not have_received(:run)
+        expect(@task_two).to have_received(:run)
       end
     end
   end

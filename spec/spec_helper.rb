@@ -86,14 +86,9 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
-  config.before :suite do
-    require root('spec', 'fixtures', 'source', 'task', 'task_task')
-  end
-
   config.before do
     stub_const 'New::HOME_DIRECTORY', root('spec', 'fixtures', 'home')
     stub_const 'New::PROJECT_DIRECTORY', root('spec', 'fixtures', 'project')
-
 
     # load spec Newfiles once
     New.load_newfiles

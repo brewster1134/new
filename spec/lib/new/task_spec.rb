@@ -96,20 +96,4 @@ describe New::Task do
       expect{@task.validate_option(:type_hash_hash, { :foo => 'foo' })}.to raise_error
     end
   end
-
-  describe '#bundle_install' do
-    before do
-      allow(@task).to receive(:system)
-      @task.send :bundle_install
-    end
-
-    after do
-      allow(@task).to receive(:system).and_call_original
-    end
-
-    it 'should run bundler with task Gemfile' do
-      expect(@task).to have_received(:system).with starting_with 'bundle install --gemfile='
-      expect(@task).to have_received(:system).with ending_with '/task/Gemfile'
-    end
-  end
 end

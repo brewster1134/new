@@ -3,3 +3,5 @@ version: 1.2.3
 tasks:
   task:
     source: spec
+  task_two:
+    source: spec

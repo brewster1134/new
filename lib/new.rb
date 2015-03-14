@@ -75,28 +75,42 @@ private
     New.load_newfiles unless @@cli
     New::Source.load_sources
 
+    # collect & verify tasks
+    new_tasks = []
+    @@new_object[:tasks].each do |task_name, task_options|
+      # skip tasks
+      next if skip_tasks.include? task_name.to_s
+
+      # lookup and add task to array
+      task = New::Source.find_task task_name, task_options[:source]
+      new_tasks << task
+
+      # verify task
+      task.verify
+    end
+
     # update options with new attributes
     @@new_object[:version] = version
     @@new_object[:changelog] = changelog
 
-    # remove skipped tasks
-    skip_tasks.each do |skip|
-      @@new_object[:tasks].delete(skip.to_sym)
-    end
+    # create new options to pass to task
+    new_options = @@new_object.dup
+    new_options.delete(:sources)
+    new_options.delete(:tasks)
 
     # run all tasks
-    @@new_object[:tasks].each do |task_name, task_options|
-      task_options = task_options.dup
-      task = New::Source.find_task task_name, task_options.delete(:source)
+    new_tasks.each do |task|
+      # dupe task options
+      new_task_options = @@new_object[:tasks][task.name].dup
 
-      # collect options
-      options = @@new_object.dup
-      options.delete(:sources)
-      options.delete(:tasks)
-      options[:task_options] = task_options
+      # remove source
+      new_task_options.delete(:source)
+
+      # add task options
+      new_options[:task_options] = new_task_options
 
       # run task
-      task.run options
+      task.run new_options
     end
 
     # write new Newfile with new version

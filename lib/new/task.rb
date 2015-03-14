@@ -45,6 +45,11 @@ class New::Task
     @options ||= self.class.class_variable_get :@@options rescue {}
   end
 
+  # task to check that outside dependencies are met before we run the tasks
+  #
+  def verify
+  end
+
   # validate a task option using a task and its associated options
   #
   # @param option_name [Symbol] name of supported option name for given task
@@ -131,17 +136,6 @@ class New::Task
     end
 
     return value
-  end
-
-protected
-
-  # run bundler for task's Gemfile
-  #
-  def bundle_install
-    task_gemfile_path = File.join(File.dirname(@path), 'Gemfile')
-    if File.file? task_gemfile_path
-      system "bundle install --gemfile=#{task_gemfile_path}"
-    end
   end
 
 private

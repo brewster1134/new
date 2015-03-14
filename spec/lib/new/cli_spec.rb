@@ -9,9 +9,6 @@ describe New::Cli do
     # initialize cli instance
     @cli = New::Cli.new
 
-    # get initialized spec task
-    @task = New::Task.tasks[:task]
-
     # proc to load the proejct newfile
     @project_newfile = -> { File.read(File.join(New::PROJECT_DIRECTORY, New::NEWFILE_NAME)) }
   end
@@ -186,7 +183,7 @@ describe New::Cli do
     end
 
     it 'should run rspec with task paths' do
-      expect(Listen).to have_received(:to).with root('spec', 'fixtures', 'source', 'task')
+      expect(Listen).to have_received(:to).with root('spec', 'fixtures', 'source', 'task'), root('spec', 'fixtures', 'source', 'task_two')
     end
   end
 
