@@ -87,6 +87,9 @@ RSpec.configure do |config|
   end
 
   config.before do
+    # make sure we stay in the root dir
+    FileUtils.chdir root
+
     stub_const 'New::HOME_DIRECTORY', root('spec', 'fixtures', 'home')
     stub_const 'New::PROJECT_DIRECTORY', root('spec', 'fixtures', 'project')
 

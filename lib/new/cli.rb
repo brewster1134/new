@@ -282,6 +282,7 @@ class New::Cli < Thor
   option :source, :type => :string, :aliases => ['-s'], :desc => 'Source name'
   option :task, :type => :string, :aliases => ['-t'], :desc => 'Task name'
   def test
+    spec_paths = []
     watch_dirs = []
 
     New.load_newfiles
@@ -297,6 +298,7 @@ class New::Cli < Thor
       New::Source.sources
     end
 
+    # collect specs to run/watch
     sources.each do |source_name, source|
       next unless source
 
@@ -322,13 +324,18 @@ class New::Cli < Thor
           original_task_dir_path = File.dirname(Dir[File.join(source.path, '**', File.basename(task.path))][0])
 
           watch_dirs << original_task_dir_path
+          spec_paths << spec_path
         end
-
-        S.ay "Running tests for `#{task_name}` task in `#{source_name}` source...", :warn
-        Kernel::system "bundle exec rspec #{spec_path}"
       end
     end
 
+    # run tests
+    if !spec_paths.empty?
+      # S.ay "Running tests for `#{task_name}` task in `#{source_name}` source...", :warn
+      Kernel::system "bundle exec rspec #{spec_paths.join(' ')}"
+    end
+
+    # watch tests
     # if watch files are found, start a listener to run the spec
     if @options['watch'] && !watch_dirs.empty?
       listener = Listen.to *watch_dirs do |modified, added, removed|

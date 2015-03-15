@@ -20,8 +20,11 @@ describe New::Cli do
 
   describe '#init' do
     before do
+      @task = New::Task.tasks[:task]
+
       stub_const 'New::NEWFILE_NAME', 'Newfile_spec'
       allow(A).to receive(:sk).and_yield 'foo'
+      allow(@task).to receive(:class_options).and_return({:foo => {}})
 
       @cli.options = {
         'name' => 'Foo Name',
@@ -29,7 +32,6 @@ describe New::Cli do
         'tasks' => ['spec#task']
       }
 
-      New::Task.tasks[:task].instance_var :class_options, {:foo => {}}
       @cli.init
       @pn = @project_newfile[]
     end
@@ -37,6 +39,7 @@ describe New::Cli do
     after do
       FileUtils.rm File.join(New::PROJECT_DIRECTORY, New::NEWFILE_NAME)
       stub_const 'New::NEWFILE_NAME', 'Newfile'
+      allow(@task).to receive(:class_options).and_call_original
     end
 
     it 'should write to the project Newfile' do
