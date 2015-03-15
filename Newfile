@@ -1,22 +1,23 @@
 ---
 sources:
-  default: brewster1134/new-tasks
-  local: ~/Code/ruby/new-tasks
-  spec: ~/Code/ruby/new/spec/fixtures/source
+  default: ~/Code/ruby/new-tasks
 name: New
 version: 1.0.2
 tasks:
+  changelog:
   gem:
     name: new
-    source: local
-    summary: A flexible tool for releasing your code into the wild
-    authors:
-    - Ryan Brewster
+    summary: 'A tool to release your software into the wild.'
     files:
-    - bin/*
-    - lib/**/*
-    - Gemfile
+      - bin/*
+      - lib/*
+    authors:
+      - Ryan Brewster
     gemspec:
-      executables:
-      - new
+      homepage: github.com/brewster1134/new
       bindir: bin
+      executables:
+        - new
+  github:
+    remote: origin
+    branch: master

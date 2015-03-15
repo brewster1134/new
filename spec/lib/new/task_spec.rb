@@ -19,16 +19,6 @@ describe New::Task do
     end
   end
 
-  describe '.verify' do
-    before do
-      @task_two.verify :foo => 'bar'
-    end
-
-    it 'should set options' do
-      expect(@task_two.options).to eq({ :foo => 'bar' })
-    end
-  end
-
   describe '.get_task_name' do
     it 'should convert task path to symbolized task name' do
       expect(New::Task.send(:get_task_name, '/path/to/foo_bar_task.rb')).to eq :foo_bar

@@ -60,8 +60,7 @@ class New::TaskTask < New::Task
 
   # options must be set to an instance var `@options`
   # otherwise `super` must be called
-  def verify options
-    super
+  def verify
     @verified = true
   end
 

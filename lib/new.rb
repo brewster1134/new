@@ -92,7 +92,7 @@ private
       next if skip_tasks.include? task_name.to_s
 
       # dupe task options
-      new_task_options = task_options.dup
+      new_task_options = task_options ? task_options.dup : {}
 
       # lookup and add task to array
       task = New::Source.find_task task_name, new_task_options.delete(:source)
@@ -101,8 +101,11 @@ private
       # add task options
       new_options[:task_options] = new_task_options
 
+      # set options
+      task.options = new_options
+
       # verify task
-      task.verify new_options
+      task.verify
     end
 
     # run all tasks

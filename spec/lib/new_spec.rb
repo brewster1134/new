@@ -71,7 +71,7 @@ describe New do
       end
 
       it 'should call verify on tasks' do
-        expect(@task).to have_received(:verify).with @expected_options
+        expect(@task).to have_received(:verify)
         expect(@task.instance_var(:verified)).to eq true
       end
 

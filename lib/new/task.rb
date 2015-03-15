@@ -33,8 +33,8 @@ class New::Task
   #
   # INSTANCE METHODS
   #
-  attr_accessor :source
-  attr_reader :name, :options, :path
+  attr_accessor :source, :options
+  attr_reader :name, :path
 
   # getters/setters for task meta data stored temporarily on a class var
   def description
@@ -47,8 +47,7 @@ class New::Task
 
   # task to check that outside dependencies are met before we run the tasks
   #
-  def verify options
-    @options = options
+  def verify
   end
 
   # validate a task option using a task and its associated options
