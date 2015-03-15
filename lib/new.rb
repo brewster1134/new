@@ -1,8 +1,6 @@
 require 'active_support/core_ext/hash/deep_merge'
 require 'yaml'
 
-puts "TEST"
-
 # Allow true/false to respond to Boolean class
 module Boolean; end
 class TrueClass; include Boolean; end
