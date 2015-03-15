@@ -2,22 +2,23 @@
 sources:
   default: ~/Code/ruby/new-tasks
 name: New
-version: 1.0.2
+version: 1.0.3
 tasks:
-  changelog:
   gem:
     name: new
-    summary: 'A tool to release your software into the wild.'
+    summary: A tool to release your software into the wild.
     files:
-      - bin/*
-      - lib/*
+    - bin/*
+    - lib/*
     authors:
-      - Ryan Brewster
+    - Ryan Brewster
+    licenses:
+    - MIT
     gemspec:
-      homepage: github.com/brewster1134/new
+      homepage: https://github.com/brewster1134/new
       bindir: bin
       executables:
-        - new
+      - new
   github:
     remote: origin
     branch: master

@@ -2,6 +2,9 @@ describe New::Task do
   before do
     @task = New::Task.tasks[:task]
     @task_two = New::Task.tasks[:task_two]
+
+    allow(@task).to receive(:validate)
+    allow(@task_two).to receive(:validate)
   end
 
   # task fixture is already loaded in spec_helper

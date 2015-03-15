@@ -2,6 +2,8 @@ describe New do
   before do
     @task = New::Task.tasks[:task]
     @task_two = New::Task.tasks[:task_two]
+    allow(@task).to receive(:validate)
+    allow(@task_two).to receive(:validate)
     allow(@task).to receive(:verify).and_call_original
     allow(@task).to receive(:run).and_call_original
     allow(@task_two).to receive(:verify).and_call_original
@@ -12,6 +14,9 @@ describe New do
   end
 
   after do
+    allow(@task).to receive(:validate).and_call_original
+    allow(@task_two).to receive(:validate).and_call_original
+
     allow(File).to receive(:open).and_call_original
   end
 

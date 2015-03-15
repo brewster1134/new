@@ -1,12 +1,13 @@
 # coding: utf-8
 Gem::Specification.new do |s|
-  s.executables = ["new"]
+  s.homepage = 'https://github.com/brewster1134/new'
   s.bindir = 'bin'
+  s.executables = ["new"]
   s.name = 'new'
   s.version = '1.0.3'
-  s.date = '2015-03-05'
-  s.summary = 'A flexible tool for releasing your code into the wild'
-  s.files = ["bin/new", "lib/new/cli.rb", "lib/new/source.rb", "lib/new/task.rb", "lib/new/validation.rb", "lib/new.rb", "Gemfile"]
+  s.date = '2015-03-15'
+  s.summary = 'A tool to release your software into the wild.'
+  s.files = ["bin/new", "lib/new.rb"]
   s.authors = ["Ryan Brewster"]
   s.add_runtime_dependency 'bundler', '~> 1.7'
   s.add_runtime_dependency 'cli_miami', '~> 0.0'

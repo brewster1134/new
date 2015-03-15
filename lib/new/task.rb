@@ -1,5 +1,7 @@
 class New::Task
   extend New::Validation
+  SILENCE = '>> /dev/null 2>&1'
+
   #
   # CLASS METHODS
   #
@@ -48,6 +50,18 @@ class New::Task
   # task to check that outside dependencies are met before we run the tasks
   #
   def verify
+  end
+
+  # validate all options
+  #
+  def validate
+    class_options.keys.each do |option_name|
+      option_value = @options[:task_options][option_name]
+      new_option_value = validate_option(option_name, option_value)
+
+      # set the new validated value
+      @options[:task_options][option_name] = new_option_value
+    end
   end
 
   # validate a task option using a task and its associated options

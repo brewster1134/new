@@ -13,7 +13,6 @@ class New
   require 'new/source'
   require 'new/task'
 
-  SILENCE = '>> /dev/null 2>&1'
   HOME_DIRECTORY = ENV['HOME']
   PROJECT_DIRECTORY = Dir.pwd
   NEWFILE_NAME = 'Newfile'
@@ -102,7 +101,10 @@ private
       new_options[:task_options] = new_task_options
 
       # set options
-      task.options = new_options
+      task.options = new_options.dup
+
+      # validate task before running anything
+      task.validate
 
       # verify task
       task.verify

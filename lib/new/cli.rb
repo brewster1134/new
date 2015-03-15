@@ -371,6 +371,8 @@ class New::Cli < Thor
           user_changelog << response
         end
       end
+
+      user_changelog
     end
 
     def get_array_from_user klass = String
