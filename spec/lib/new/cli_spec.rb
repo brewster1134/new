@@ -29,7 +29,7 @@ describe New::Cli do
         'tasks' => ['spec#task']
       }
 
-      New::Task.tasks[:task].instance_var :options, {:foo => {}}
+      New::Task.tasks[:task].instance_var :class_options, {:foo => {}}
       @cli.init
       @pn = @project_newfile[]
     end

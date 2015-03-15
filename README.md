@@ -21,7 +21,7 @@ new release
 
 ---
 #### Global Newfile
-You can set defaults in a Newfile in your home directory.  These options will always be loaded whenever new runs.  This is a great place to add your custom sources. You can use any format supported by [Sourcerer](https://github.com/brewster1134/sourcerer)
+You can set defaults in a Newfile in your home directory. These options will always be loaded whenever new runs. This is a great place to add your custom sources. You can use any format supported by [Sourcerer](https://github.com/brewster1134/sourcerer)
 ```yaml
 sources:
   local: /path/to/local/new-tasks
@@ -51,7 +51,7 @@ tasks:
 
 ---
 #### Release New Version
-To release a new version of your software, simply run `new` from your project's root. You will be prompted to choose what new semantic version you want to release.  Make sure to follow [semantic versioning rules](http://semver.org/)!
+To release a new version of your software, simply run `new` from your project's root. You will be prompted to choose what new semantic version you want to release. Make sure to follow [semantic versioning rules](http://semver.org/)!
 ```shell
 new
 ```

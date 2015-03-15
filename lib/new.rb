@@ -13,6 +13,7 @@ class New
   require 'new/source'
   require 'new/task'
 
+  SILENCE = '>> /dev/null 2>&1'
   HOME_DIRECTORY = ENV['HOME']
   PROJECT_DIRECTORY = Dir.pwd
   NEWFILE_NAME = 'Newfile'
@@ -75,20 +76,6 @@ private
     New.load_newfiles unless @@cli
     New::Source.load_sources
 
-    # collect & verify tasks
-    new_tasks = []
-    @@new_object[:tasks].each do |task_name, task_options|
-      # skip tasks
-      next if skip_tasks.include? task_name.to_s
-
-      # lookup and add task to array
-      task = New::Source.find_task task_name, task_options[:source]
-      new_tasks << task
-
-      # verify task
-      task.verify
-    end
-
     # update options with new attributes
     @@new_object[:version] = version
     @@new_object[:changelog] = changelog
@@ -98,19 +85,29 @@ private
     new_options.delete(:sources)
     new_options.delete(:tasks)
 
-    # run all tasks
-    new_tasks.each do |task|
-      # dupe task options
-      new_task_options = @@new_object[:tasks][task.name].dup
+    # collect & verify tasks
+    new_tasks = []
+    @@new_object[:tasks].each do |task_name, task_options|
+      # skip tasks
+      next if skip_tasks.include? task_name.to_s
 
-      # remove source
-      new_task_options.delete(:source)
+      # dupe task options
+      new_task_options = task_options.dup
+
+      # lookup and add task to array
+      task = New::Source.find_task task_name, new_task_options.delete(:source)
+      new_tasks << task
 
       # add task options
       new_options[:task_options] = new_task_options
 
-      # run task
-      task.run new_options
+      # verify task
+      task.verify new_options
+    end
+
+    # run all tasks
+    new_tasks.each do |task|
+      task.run
     end
 
     # write new Newfile with new version

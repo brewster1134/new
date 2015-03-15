@@ -34,20 +34,21 @@ class New::Task
   # INSTANCE METHODS
   #
   attr_accessor :source
-  attr_reader :name, :path
+  attr_reader :name, :options, :path
 
   # getters/setters for task meta data stored temporarily on a class var
   def description
     @description ||= self.class.class_variable_get :@@description rescue ''
   end
 
-  def options
-    @options ||= self.class.class_variable_get :@@options rescue {}
+  def class_options
+    @class_options ||= self.class.class_variable_get :@@options rescue {}
   end
 
   # task to check that outside dependencies are met before we run the tasks
   #
-  def verify
+  def verify options
+    @options = options
   end
 
   # validate a task option using a task and its associated options
@@ -58,7 +59,7 @@ class New::Task
   #         if no valid value can be made, return nil
   def validate_option option_name, value
     # validate supported options
-    unless option = options[option_name]
+    unless option = class_options[option_name]
       raise_error option_name, 'is not a supported option'
     end
 

@@ -1,6 +1,7 @@
 describe New::Task do
   before do
     @task = New::Task.tasks[:task]
+    @task_two = New::Task.tasks[:task_two]
   end
 
   # task fixture is already loaded in spec_helper
@@ -15,6 +16,16 @@ describe New::Task do
       # since task class is unloaded after it is initialized, can't test again actual class name
       expect(@task.class.to_s).to eq 'New::TaskTask'
       expect(@task).to be_a New::Task
+    end
+  end
+
+  describe '.verify' do
+    before do
+      @task_two.verify :foo => 'bar'
+    end
+
+    it 'should set options' do
+      expect(@task_two.options).to eq({ :foo => 'bar' })
     end
   end
 

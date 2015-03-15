@@ -58,6 +58,14 @@ class New::TaskTask < New::Task
     }
   }
 
-  def run options
+  # options must be set to an instance var `@options`
+  # otherwise `super` must be called
+  def verify options
+    super
+    @verified = true
+  end
+
+  def run
+    @ran = true
   end
 end

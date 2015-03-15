@@ -103,7 +103,7 @@ class New::Cli < Thor
       S.ay
 
       newfile_object[:tasks][task.name] = {}
-      task.options.each do |option_name, option_settings|
+      task.class_options.each do |option_name, option_settings|
         S.ay option_name.to_s, :preset => :highlight_key
         S.ay option_settings[:description], :preset => :highlight_value, :indent => 2
 
@@ -418,7 +418,7 @@ class New::Cli < Thor
           # do not allow nested arrays/hashes
           # these should be declared as their own option
           if klass == Array || klass == Hash
-            S.ay 'Hash options cannot have nested Arrays or Hashes.  They should be declared as their own option.', :fail
+            S.ay 'Hash options cannot have nested Arrays or Hashes. They should be declared as their own option.', :fail
             exit
           end
 

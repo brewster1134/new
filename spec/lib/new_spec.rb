@@ -2,11 +2,10 @@ describe New do
   before do
     @task = New::Task.tasks[:task]
     @task_two = New::Task.tasks[:task_two]
-
-    allow(@task).to receive(:verify)
-    allow(@task).to receive(:run)
-    allow(@task_two).to receive(:verify)
-    allow(@task_two).to receive(:run)
+    allow(@task).to receive(:verify).and_call_original
+    allow(@task).to receive(:run).and_call_original
+    allow(@task_two).to receive(:verify).and_call_original
+    allow(@task_two).to receive(:run).and_call_original
 
     allow(File).to receive(:open)
     allow(New::Source).to receive(:find_task).and_call_original
@@ -14,8 +13,6 @@ describe New do
 
   after do
     allow(File).to receive(:open).and_call_original
-    allow(@task).to receive(:run).and_call_original
-    allow(@task_two).to receive(:run).and_call_original
   end
 
   # Newfiles are preloaded in spec_helper
@@ -54,10 +51,17 @@ describe New do
   describe '#initialize' do
     context 'with all tasks' do
       before do
+        @expected_options = {
+          :name => 'Project Fixture',
+          :version => '1.2.4',
+          :changelog => ['changelog'],
+          :task_options => {}
+        }
+
         New.new '1.2.4', ['changelog']
       end
 
-      it 'should add new attributes' do
+      it 'should add new attributes to the global object' do
         expect(New.new_object[:version]).to eq '1.2.4'
         expect(New.new_object[:changelog]).to eq ['changelog']
       end
@@ -66,24 +70,26 @@ describe New do
         expect(New::Source).to have_received(:find_task).with :task, 'spec'
       end
 
+      it 'should call verify on tasks' do
+        expect(@task).to have_received(:verify).with @expected_options
+        expect(@task.instance_var(:verified)).to eq true
+      end
+
       it 'should call run on tasks' do
-        expect(@task).to have_received(:run).with({
-          :name => 'Project Fixture',
-          :version => '1.2.4',
-          :changelog => ['changelog'],
-          :task_options => {}
-        })
+        expect(@task).to have_received(:run)
+        expect(@task.instance_var(:ran)).to eq true
       end
 
-      it 'shouldnt modify the original new object' do
-        expect(New.new_object[:tasks][:task][:source]).to eq 'spec'
-      end
-
-      it 'should run verify before run' do
+      it 'should run all verify methods before any run methods' do
         expect(@task).to have_received(:verify).ordered
         expect(@task_two).to have_received(:verify).ordered
         expect(@task).to have_received(:run).ordered
         expect(@task_two).to have_received(:run).ordered
+      end
+
+      it 'should set instance options' do
+        expect(@task.instance_var(:options)).to eq @expected_options
+        expect(@task_two.instance_var(:options)).to eq @expected_options
       end
     end
 
@@ -93,7 +99,9 @@ describe New do
       end
 
       it 'should skip task' do
+        expect(@task).to_not have_received(:verify)
         expect(@task).to_not have_received(:run)
+        expect(@task_two).to have_received(:verify)
         expect(@task_two).to have_received(:run)
       end
     end
