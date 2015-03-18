@@ -35,9 +35,9 @@ class New::Task
   #
   # INSTANCE METHODS
   #
-  attr_accessor :source, :options
+  attr_accessor :source
   attr_reader :name, :path
-  attr_reader :options
+  attr_writer :options
 
   # getters/setters for task meta data stored temporarily on a class var
   def description
