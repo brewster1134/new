@@ -35,9 +35,8 @@ class New::Task
   #
   # INSTANCE METHODS
   #
-  attr_accessor :source
+  attr_accessor :source, :options
   attr_reader :name, :path
-  attr_writer :options
 
   # getters/setters for task meta data stored temporarily on a class var
   def description
@@ -46,10 +45,6 @@ class New::Task
 
   def class_options
     @class_options ||= self.class.class_variable_get :@@options rescue {}
-  end
-
-  def options
-    @options.dup
   end
 
   # task to check that outside dependencies are met before we run the tasks
