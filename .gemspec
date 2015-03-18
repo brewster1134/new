@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.executables = ["new"]
   s.name = 'new'
   s.version = '1.0.4'
-  s.date = '2015-03-15'
+  s.date = '2015-03-17'
   s.summary = 'A tool to release your software into the wild.'
   s.files = ["bin/new", "lib/new.rb"]
   s.authors = ["Ryan Brewster"]

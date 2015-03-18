@@ -4,6 +4,7 @@ sources:
 name: New
 version: 1.0.3
 tasks:
+  changelog:
   gem:
     name: new
     summary: A tool to release your software into the wild.
