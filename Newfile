@@ -2,7 +2,7 @@
 sources:
   default: ~/Code/ruby/new-tasks
 name: New
-version: 1.0.3
+version: 1.0.4
 tasks:
   changelog:
   gem:
