@@ -85,6 +85,11 @@ private
     new_options.delete(:tasks)
 
     # collect & verify tasks
+    if @@cli
+      S.ay
+      S.ay 'Verifying all tasks...', :task_path
+    end
+
     new_tasks = []
     @@new_object[:tasks].each do |task_name, task_options|
       # skip tasks
@@ -108,11 +113,26 @@ private
 
       # verify task
       task.verify
+
+      if @@cli
+        S.ay task_name.to_s, :newline => false, :preset => :highlight_key
+        S.ay ': Verified', :highlight_value
+      end
     end
 
     # run all tasks
+    if @@cli
+      S.ay
+      S.ay 'Running all tasks...', :task_path
+    end
+
     new_tasks.each do |task|
       task.run
+
+      if @@cli
+        S.ay task.name.to_s, :newline => false, :preset => :highlight_key
+        S.ay ': Success', :highlight_value
+      end
     end
 
     # write new Newfile with new version

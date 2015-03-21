@@ -122,11 +122,11 @@ class New::Cli < Thor
 
         # GET USER INPUT FOR ARRAY TYPE
         #
-        task_type = option_settings[:type]
+        option_type = option_settings[:type]
         case
 
         # collect array option type values
-        when task_type == Array
+        when option_type == Array
           # cast type onto all user input values (default is String)
           klass = option_settings[:validation] || String
 
@@ -142,7 +142,7 @@ class New::Cli < Thor
           end
 
         # collect hash option type values
-        when task_type == Hash
+        when option_type == Hash
           # loop through the expected keys from the validation and get users input
           option_value = nil
           until option_value
@@ -177,7 +177,7 @@ class New::Cli < Thor
 
     # Success Message
     S.ay "A `#{'Newfile'.green}` was successfully created for your project `#{name.to_s.green}`"
-    S.ay 'Double check the values are correct, and make any neccessar modifications.', :indent => 2
+    S.ay 'Open the file to verify the values are correct, and make any neccessary modifications.', :indent => 2
     S.ay "You are now ready to run `#{'new release'.green}` to release your software into the wild!", :indent => 2
     S.ay
   end
@@ -353,7 +353,7 @@ class New::Cli < Thor
 
   no_commands do
     def get_changelog_from_user
-      S.ay 'Now lets add some items to the changelog'
+      S.ay 'Lets add some items to the changelog'
       S.ay 'Add multiple entries by pressing ENTER after each one', :preset => :warn, :indent => 2
       S.ay 'Enter an empty value to finish', :preset => :warn, :indent => 2
 
@@ -362,7 +362,7 @@ class New::Cli < Thor
 
       # add entries to the changelog until an empty string is entered
       until user_response == '' && !user_changelog.empty?
-        A.sk user_changelog.compact.join("\n"), :preset => :prompt do |response|
+        A.sk user_changelog.compact.join("\n"), :prompt do |response|
           if response.empty?
             user_response = ''
             next
@@ -375,51 +375,78 @@ class New::Cli < Thor
       user_changelog
     end
 
-    def get_array_from_user klass = String
-      S.ay "We need to collect a list of #{klass}s"
-      S.ay 'Add multiple values by pressing ENTER after each one', :preset => :warn, :indent => 2
-      S.ay 'Enter an empty value to finish', :preset => :warn, :indent => 2
-
+    def get_array_from_user validation = String
+      # start to build the array of user values
       user_array = []
-      user_response = nil
 
-      # add to the array until an empty string is entered
-      until user_response == ''
-        A.sk user_array.compact.join(', '), :preset => :prompt do |response|
+      # convert array to hash of Strings
+      if validation.is_a? Array
+        validation_hash = {}
+        validation.each do |v|
+          validation_hash[v.to_sym] = String
+        end
+        validation = validation_hash
+      end
 
-          # if the option is valid, pass through the empty string to end entering values
-          if response.empty?
-            user_response = ''
-            next
+      if validation.is_a? Hash
+        S.ay 'We need to collect a list of complex objects'
+
+        user_response = nil
+        until user_response == 'n'
+          S.ay "#{user_array.length} objects created: ", :preset => :warn, :indent => 2, :newline => false
+          S.ay user_array.join(', ')
+          A.sk 'Press ENTER to create another object.  Enter `n` to stop.', :prompt do |response|
+            if response == 'n'
+              user_response = 'n'
+              next
+            end
+
+            user_response = get_hash_from_user(validation, false)
+            user_array << user_response
           end
+        end
 
-          user_response = New::Task.validate_class(response, klass) rescue nil
-          user_array << user_response
+      else
+        S.ay "We need to collect a list of #{validation}s"
+        S.ay 'Add multiple values by pressing ENTER after each one', :preset => :warn, :indent => 2
+        S.ay 'Enter an empty value to finish', :preset => :warn, :indent => 2
+
+        # add to the array until an empty string is entered
+        user_response = nil
+        until user_response == ''
+          A.sk user_array.compact.join(', '), :prompt do |response|
+
+            # if the option is valid, pass through the empty string to end entering values
+            if response.empty?
+              user_response = ''
+              next
+            end
+
+            user_response = New::Task.validate_class(response, validation) rescue nil
+            user_array << user_response
+          end
         end
       end
 
       return user_array.compact
     end
 
-    def get_hash_from_user validation = {}
+    def get_hash_from_user validation = {}, allow_custom_keys = true
       # start to build the hash of user values
       user_hash = {}
 
-      # make sure validation exists as a hash of keys and klass values
-      validation = case validation
-      when nil then {}
-      when Hash then validation
-      when Array
+      # convert array to hash of Strings
+      if validation.is_a? Array
         validation_hash = {}
-        validation.each do |e|
-          validation_hash[e] = String
+        validation.each do |v|
+          validation_hash[v.to_sym] = String
         end
-        validation_hash
+        validation = validation_hash
       end
 
       # get user values for required validation keys
       validation.each do |key, klass|
-        S.ay 'Now we need to collect some required values'
+        S.ay 'We need to collect some required values'
 
         user_response = nil
         until user_response
@@ -449,32 +476,34 @@ class New::Cli < Thor
         end
       end
 
-      # Allow users to enter custom keys AND values
-      S.ay 'Now you can add custom keys & values if you want'
-      S.ay 'Add multiple key/value pairs by pressing ENTER after each one', :preset => :warn, :indent => 2
-      S.ay 'Enter an empty key to finish', :preset => :warn, :indent => 2
+      if allow_custom_keys
+        # Allow users to enter custom keys AND values
+        S.ay 'You can add custom keys & values if you want'
+        S.ay 'Add multiple key/value pairs by pressing ENTER after each one', :preset => :warn, :indent => 2
+        S.ay 'Enter an empty key to finish', :preset => :warn, :indent => 2
 
-      user_key_response = nil
-      until user_key_response == ''
-        A.sk 'Enter a KEY name', :prompt do |key_response|
-          # exit loop if user is done entering info
-          if key_response == ''
-            user_key_response = ''
-            next
-          end
+        user_key_response = nil
+        until user_key_response == ''
+          A.sk 'Enter a KEY name', :prompt do |key_response|
+            # exit loop if user is done entering info
+            if key_response == ''
+              user_key_response = ''
+              next
+            end
 
-          user_value_response = nil
-          until user_value_response
-            A.sk "Enter a VALUE for `#{key_response}`", :prompt do |value_response|
-              # make sure value exists for user created key
-              if value_response == ''
-                user_value_response = nil
-                next
+            user_value_response = nil
+            until user_value_response
+              A.sk "Enter a VALUE for `#{key_response}`", :prompt do |value_response|
+                # make sure value exists for user created key
+                if value_response == ''
+                  user_value_response = nil
+                  next
+                end
+
+                # create key/value pair
+                user_hash[key_response.to_sym] = user_value_response = value_response
+                S.ay user_hash
               end
-
-              # create key/value pair
-              user_hash[key_response.to_sym] = user_value_response = value_response
-              S.ay user_hash
             end
           end
         end

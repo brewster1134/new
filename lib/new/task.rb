@@ -83,12 +83,12 @@ class New::Task
         raise_error option_name, 'is a required option'
 
       # otherwise set the default
-      elsif option[:default]
+      else
         value = option[:default]
       end
     end
 
-    # set default
+    # set default type
     type = option[:type] || String
 
     # validate and convert value to specified type
@@ -111,10 +111,29 @@ class New::Task
         validate_range option_name, value, validation
 
       when type == Array
+        # set default
         validation = validation || String
 
-        unless validation == String || validation == Symbol || validation == Boolean || validation == Integer || validation == Float
-          raise_error option_name, "validation must be a [String|Symbol|Boolean|Integer|Float]"
+        # If validation is an array convert it to a hash of String
+        if validation.is_a? Array
+          validation_hash = {}
+          validation.each do |v|
+            validation_hash[v] = String
+          end
+          validation = validation_hash
+        end
+
+        # if validation is a hash, make sure all values exist for required keys
+        if validation.is_a? Hash
+          value.each do |v|
+            if validation.keys != v.keys
+              raise_error option_name, "validation for an Array must contain values for `#{validation.keys.join(', ')}`"
+            end
+          end
+        else
+          unless validation == String || validation == Symbol || validation == Boolean || validation == Integer || validation == Float
+            raise_error option_name, "validation for an Array must be a [String|Symbol|Boolean|Integer|Float]"
+          end
         end
 
         # validate each element in array with the validation class type

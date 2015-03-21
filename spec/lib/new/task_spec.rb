@@ -1,15 +1,10 @@
 describe New::Task do
-  before do
-    @task = New::Task.tasks[:task]
-    @task_two = New::Task.tasks[:task_two]
-
-    allow(@task).to receive(:validate)
-    allow(@task_two).to receive(:validate)
-  end
-
-  # task fixture is already loaded in spec_helper
-  #
   describe '.inherited' do
+    before do
+      # task fixture is already loaded in spec_helper
+      @task = New::Task.tasks[:task]
+    end
+
     it 'should initialize sub-task' do
       expect(@task.instance_var(:path)).to ending_with 'task_task.rb'
       expect(@task.instance_var(:name)).to eq :task
@@ -29,75 +24,247 @@ describe New::Task do
   end
 
   describe '.validate_option' do
-    it 'should validate required options' do
-      expect(@task.validate_option(:required, 'foo')).to eq 'foo'
-
-      expect{@task.validate_option(:required, nil)}.to raise_error
-      expect{@task.validate_option(:required, '')}.to raise_error
-      expect{@task.validate_option(:required, [])}.to raise_error
-      expect{@task.validate_option(:required, {})}.to raise_error
+    before do
+      @task = New::Task.new :validate_option, Dir.pwd
     end
 
-    it 'should validate default options' do
-      expect(@task.validate_option(:default, nil)).to eq 'default value'
-      expect(@task.validate_option(:default, '')).to eq 'default value'
-      expect(@task.validate_option(:default, [])).to eq 'default value'
-      expect(@task.validate_option(:default, {})).to eq 'default value'
-      expect(@task.validate_option(:default, 'foo')).to eq 'foo'
+    context 'with required options' do
+      before do
+        @task.instance_var :class_options, {
+          :required => {
+            :required => true
+          }
+        }
+      end
+
+      it 'should accept any value' do
+        expect(@task.validate_option(:required, 'foo')).to eq 'foo'
+      end
+
+      it 'should reject missing values' do
+        expect{@task.validate_option(:required, nil)}.to raise_error
+        expect{@task.validate_option(:required, '')}.to raise_error
+        expect{@task.validate_option(:required, [])}.to raise_error
+        expect{@task.validate_option(:required, {})}.to raise_error
+      end
     end
 
-    it 'should validate strings' do
-      expect(@task.validate_option(:type_string, 'foo_BAZ_bar')).to eq 'foo_BAZ_bar'
+    context 'with defaulted options' do
+      before do
+        @task.instance_var :class_options, {
+          :default => {
+            :default => 'default value'
+          }
+        }
+      end
 
-      expect{@task.validate_option(:type_string, 'bar_BAZ_foo')}.to raise_error
+      it 'should accept missing values' do
+        expect(@task.validate_option(:default, nil)).to eq 'default value'
+        expect(@task.validate_option(:default, '')).to eq 'default value'
+        expect(@task.validate_option(:default, [])).to eq 'default value'
+        expect(@task.validate_option(:default, {})).to eq 'default value'
+      end
+
+      it 'should accept user values' do
+        expect(@task.validate_option(:default, 'foo')).to eq 'foo'
+      end
     end
 
-    it 'should validate symbols' do
-      expect(@task.validate_option(:type_symbol, 'foo_BAZ_bar')).to eq :foo_baz_bar
+    context 'with strings' do
+      before do
+        @task.instance_var :class_options, {
+          :type_string => {
+            :validation => /foo_.+_bar/
+          }
+        }
+      end
 
-      expect{@task.validate_option(:type_symbol, 'bar_BAZ_foo')}.to raise_error
+      it 'should accept regex matches' do
+        expect(@task.validate_option(:type_string, 'foo_BAZ_bar')).to eq 'foo_BAZ_bar'
+      end
+
+      it 'should reject regex mismatches' do
+        expect{@task.validate_option(:type_string, 'bar_BAZ_foo')}.to raise_error
+      end
     end
 
-    it 'should validate booleans' do
-      expect(@task.validate_option(:type_boolean, 'true')).to eq true
-      expect(@task.validate_option(:type_boolean, 'false')).to eq false
+    context 'with symbols' do
+      before do
+        @task.instance_var :class_options, {
+          :type_symbol => {
+            :type => Symbol,
+            :validation => /foo_.+_bar/
+          }
+        }
+      end
 
-      expect{@task.validate_option(:type_boolean, 'foo')}.to raise_error
+      it 'should accept regex matches' do
+        expect(@task.validate_option(:type_symbol, 'foo_BAZ_bar')).to eq :foo_baz_bar
+      end
+
+      it 'should reject regex mismatches' do
+        expect{@task.validate_option(:type_symbol, 'bar_BAZ_foo')}.to raise_error
+      end
     end
 
-    it 'should validate integers' do
-      expect(@task.validate_option(:type_integer, '1')).to eq 1
-      expect(@task.validate_option(:type_integer, '2.9')).to eq 2
+    context 'with booleans' do
+      before do
+        @task.instance_var :class_options, {
+          :type_boolean => {
+            :type => Boolean
+          }
+        }
+      end
 
-      expect{@task.validate_option(:type_integer, '11')}.to raise_error
-      expect{@task.validate_option(:type_integer, 'foo')}.to raise_error
+      it 'should accept approved boolean keywords' do
+        expect(@task.validate_option(:type_boolean, 'true')).to eq true
+        expect(@task.validate_option(:type_boolean, 'Yes')).to eq true
+
+        expect(@task.validate_option(:type_boolean, 'false')).to eq false
+        expect(@task.validate_option(:type_boolean, 'No')).to eq false
+      end
+
+      it 'should reject non-approved keywords' do
+        expect{@task.validate_option(:type_boolean, 'foo')}.to raise_error
+      end
     end
 
-    it 'should validate floats' do
-      expect(@task.validate_option(:type_float, '2')).to eq 2.0
-      expect(@task.validate_option(:type_float, '2.9')).to eq 2.9
+    context 'with integers' do
+      before do
+        @task.instance_var :class_options, {
+          :type_integer => {
+            :type => Integer,
+            :validation => (1..10)
+          }
+        }
+      end
 
-      expect{@task.validate_option(:type_float, '11')}.to raise_error
-      expect{@task.validate_option(:type_float, 'foo')}.to raise_error
+      it 'should accept numbers' do
+        expect(@task.validate_option(:type_integer, '1')).to eq 1
+        expect(@task.validate_option(:type_integer, '2.9')).to eq 2
+      end
+
+      it 'should reject out-of-range numbers' do
+        expect{@task.validate_option(:type_integer, '11')}.to raise_error
+      end
+
+      it 'should reject non-numbers' do
+        expect{@task.validate_option(:type_integer, 'foo')}.to raise_error
+      end
     end
 
-    it 'should validate arrays' do
-      expect(@task.validate_option(:type_array, ['foo'])).to eq [:foo]
-      expect(@task.validate_option(:type_array, [nil, '', 'bar'])).to eq [:bar]
+    context 'with floats' do
+      before do
+        @task.instance_var :class_options, {
+          :type_float => {
+            :type => Float,
+            :validation => (0.5..10.5)
+          }
+        }
+      end
 
-      expect{@task.validate_option(:type_array, [1])}.to raise_error
+      it 'should accept numbers' do
+        expect(@task.validate_option(:type_float, '1')).to eq 1.0
+        expect(@task.validate_option(:type_float, '2.9')).to eq 2.9
+      end
+
+      it 'should reject out-of-range numbers' do
+        expect{@task.validate_option(:type_float, '11')}.to raise_error
+      end
+
+      it 'should reject non-numbers' do
+        expect{@task.validate_option(:type_float, 'foo')}.to raise_error
+      end
     end
 
-    it 'should validate hashes with array of keys' do
-      expect(@task.validate_option(:type_hash_array, { :foo => 'foo' })).to eq({ :foo => 'foo' })
+    context 'with arrays' do
+      context 'with type validation' do
+        before do
+          @task.instance_var :class_options, {
+            :type_array => {
+              :type => Array,
+              :validation => Symbol
+            }
+          }
+        end
 
-      expect{@task.validate_option(:type_hash_array, { :bar => 'foo' })}.to raise_error
+        it 'should accept arrays with matchable types' do
+          expect(@task.validate_option(:type_array, ['foo'])).to eq [:foo]
+        end
+
+        it 'should reject arrays with mismatched types' do
+          expect{@task.validate_option(:type_array, [1])}.to raise_error
+        end
+
+        it 'should compact arrays' do
+          expect(@task.validate_option(:type_array, ['', 'bar'])).to eq [:bar]
+        end
+      end
+
+      context 'with array validation' do
+        before do
+          @task.instance_var :class_options, {
+            :type_array_hash => {
+              :type => Array,
+              :validation => [:foo]
+            }
+          }
+        end
+
+        it 'should accept arrays with an object of matching keys' do
+          expect(@task.validate_option(:type_array_hash, [{ :foo => 'foo' }])).to eq([{ :foo => 'foo' }])
+        end
+
+        it 'should reject arrays with an object without matching keys' do
+          expect{@task.validate_option(:type_array_hash, [{ :bar => 'foo' }])}.to raise_error
+        end
+      end
     end
 
-    it 'should validate hashes with hash of keys/classes' do
-      expect(@task.validate_option(:type_hash_hash, { :foo => '1' })).to eq({ :foo => 1 })
+    context 'with hashes' do
+      context 'with array validation' do
+        before do
+          @task.instance_var :class_options, {
+            :type_hash_array => {
+              :type => Hash,
+              :validation => [:foo]
+            }
+          }
+        end
 
-      expect{@task.validate_option(:type_hash_hash, { :foo => 'foo' })}.to raise_error
+        it 'should accept hashes with matching keys' do
+          expect(@task.validate_option(:type_hash_array, { :foo => 'foo' })).to eq({ :foo => 'foo' })
+        end
+
+        it 'should reject hashes without matching keys' do
+          expect{@task.validate_option(:type_hash_array, { :bar => 'foo' })}.to raise_error
+        end
+      end
+
+      context 'with hash validation' do
+        before do
+          @task.instance_var :class_options, {
+            :type_hash_hash => {
+              :type => Hash,
+              :validation => {
+                :foo => Integer
+              }
+            }
+          }
+        end
+
+        it 'should accept hashes with matching keys & types' do
+          expect(@task.validate_option(:type_hash_hash, { :foo => '1' })).to eq({ :foo => 1 })
+        end
+
+        it 'should reject hashes without matching keys' do
+          expect{@task.validate_option(:type_hash_hash, { :bar => '1' })}.to raise_error
+        end
+
+        it 'should reject hashes with matching keys but mismatched types' do
+          expect{@task.validate_option(:type_hash_hash, { :foo => 'foo' })}.to raise_error
+        end
+      end
     end
   end
 end

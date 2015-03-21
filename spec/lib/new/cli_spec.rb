@@ -191,6 +191,14 @@ describe New::Cli do
   end
 
   describe '#get_array_from_user' do
+    before do
+      allow(@cli).to receive(:get_hash_from_user)
+    end
+
+    after do
+      allow(@cli).to receive(:get_hash_from_user).and_call_original
+    end
+
     it 'should prompt for valid values' do
       responses = ['foo', 'bar', '']
       allow(A).to receive(:sk) do |text, options, &block|
@@ -209,6 +217,39 @@ describe New::Cli do
 
       user_array = @cli.get_array_from_user Integer
       expect(user_array).to eq([1, 2])
+    end
+
+    it 'should accept an array' do
+      allow(@cli).to receive(:get_hash_from_user).and_return({ :foo => 'foo1', :bar => 'bar1' }, { :foo => 'foo2', :bar => 'bar2' })
+
+      responses = ['y', 'y', 'n']
+      allow(A).to receive(:sk) do |text, options, &block|
+        block.call responses.shift
+      end
+
+      user_array = @cli.get_array_from_user [:foo, :bar]
+      expect(user_array).to eq([
+        { :foo => 'foo1', :bar => 'bar1' },
+        { :foo => 'foo2', :bar => 'bar2' }
+      ])
+    end
+
+    it 'should accept a hash' do
+      allow(@cli).to receive(:get_hash_from_user).and_return({ :foo => 1, :bar => true }, { :foo => 2, :bar => false })
+
+      responses = ['y', 'y', 'n']
+      allow(A).to receive(:sk) do |text, options, &block|
+        block.call responses.shift
+      end
+
+      user_array = @cli.get_array_from_user({
+        :foo => Integer,
+        :bar => Boolean
+      })
+      expect(user_array).to eq([
+        { :foo => 1, :bar => true },
+        { :foo => 2, :bar => false }
+      ])
     end
   end
 
