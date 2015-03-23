@@ -7,11 +7,17 @@ require 'semantic'
 require 'thor'
 require 'yaml'
 
-CliMiami.set_preset :prompt, :color => :green
-CliMiami.set_preset :highlight_key, :style => :bold
-CliMiami.set_preset :highlight_value, :color => :blue, :style => :bright
-CliMiami.set_preset :task_source, :color => :white, :style => [:bold, :underline]
-CliMiami.set_preset :task_path, :color => :blue, :style => :underline
+CliMiami.set_preset :error, :color => :red
+CliMiami.set_preset :fine_print, :color => :cyan
+CliMiami.set_preset :header, :color => :green
+CliMiami.set_preset :highlight_key, :indent => 2, :newline => false, :padding => 30, :justify => :rjust
+CliMiami.set_preset :highlight_value, :color => :blue, :style => :bright, :indent => 1
+CliMiami.set_preset :instruction, :color => :yellow, :indent => 2
+CliMiami.set_preset :list_item, :indent => 2
+CliMiami.set_preset :prompt, :color => :yellow, :style => :bold
+
+# create a horizontal line
+HR = -> {S.ay('-' * 32 , :header)}
 
 class New::Cli < Thor
   desc 'init', 'Create a Newfile for your project'
@@ -41,7 +47,7 @@ class New::Cli < Thor
         response = A.sk 'Current Project Version:', :prompt
         version = Semantic::Version.new response
       rescue
-        S.ay "`#{response}` is not a valid semantic version (e.g. 1.2.3)", :fail
+        S.ay "`#{response}` is not a valid semantic version (e.g. 1.2.3)", :error
       end
     end
     newfile_object[:version] = version.to_s
@@ -60,10 +66,10 @@ class New::Cli < Thor
       S.ay
       self.tasks :show_source => true, :load_newfiles => false, :load_sources => false
 
-      S.ay 'Add multiple tasks by pressing ENTER after each one'
-      S.ay 'Enter tasks in the order you want them to run', :preset => :warn, :indent => 2
-      S.ay 'Enter both the source and the task (e.g. source#task)', :preset => :warn, :indent => 2
-      S.ay 'Enter an empty value to finish', :preset => :warn, :indent => 2
+      S.ay 'Add multiple tasks by pressing ENTER after each one', :instruction
+      S.ay 'Enter tasks in the order you want them to run', :instruction
+      S.ay 'Enter both the source and the task (e.g. source#task)', :instruction
+      S.ay 'Enter an empty value to finish', :instruction
 
       added_task = nil
       until added_task == '' && !tasks_list.empty?
@@ -87,25 +93,33 @@ class New::Cli < Thor
     end
 
     # output the summary so far (no task options entered yet)
-    S.ay 'Name: ', :preset => :highlight_key, :newline => false
-    S.ay name, :highlight_value
-    S.ay 'Version: ', :preset => :highlight_key, :newline => false
-    S.ay version.to_s, :highlight_value
-    S.ay 'Tasks: ', :highlight_key
-    tasks_list.each do |task|
-      S.ay "#{task.source.name}##{task.name}", :preset => :highlight_value, :indent => 2
+    padding = 10
+    S.ay 'Name:', :preset => :highlight_key, :padding => padding
+    S.ay name, :preset => :highlight_value
+    S.ay 'Version:', :preset => :highlight_key, :padding => padding
+    S.ay version.to_s, :preset => :highlight_value
+    S.ay 'Tasks:', :preset => :highlight_key, :padding => padding
+
+    # output first task without a padding so it looks nicer
+    tasks_dup = tasks_list.dup
+    first_task = tasks_dup.shift
+    S.ay "#{first_task.source.name}##{first_task.name}", :highlight_value
+    tasks_dup.each do |task|
+      S.ay "#{task.source.name}##{task.name}", :preset => :highlight_value, :indent => padding + 3
     end
     S.ay
 
     tasks_list.each do |task|
-      S.ay 'OK, now lets set options for ', :newline => false, :preset => :highlight_key
-      S.ay task.name.to_s, :highlight_value
+      HR.call
+      S.ay 'OK, now lets set options for', :highlight_key
+      S.ay task.name.to_s.upcase, :highlight_value
+      HR.call
       S.ay
 
       newfile_object[:tasks][task.name] = {}
       task.class_options.each do |option_name, option_settings|
-        S.ay option_name.to_s, :preset => :highlight_key
-        S.ay option_settings[:description], :preset => :highlight_value, :indent => 2
+        S.ay option_name.to_s, :preset => :highlight_key, :padding => 0
+        S.ay option_settings[:description], :highlight_value
 
         # show default
         default = option_settings[:default]
@@ -116,8 +130,7 @@ class New::Cli < Thor
           else default.to_s
           end
 
-          S.ay 'default: ', :newline => false, :indent => 2
-          S.ay default, :highlight_value
+          S.ay "default: #{default}", :preset => :fine_print, :indent => option_name.length + 3
         end
 
         # GET USER INPUT FOR ARRAY TYPE
@@ -135,7 +148,7 @@ class New::Cli < Thor
           until option_value
             begin
               option_value = get_array_from_user(klass)
-              option_value = task.validate_option(option_name, option_value)
+              option_value = New::Task.validate_option(option_name, option_settings, option_value)
             rescue
               option_value = nil
             end
@@ -148,7 +161,7 @@ class New::Cli < Thor
           until option_value
             begin
               option_value = get_hash_from_user(option_settings[:validation])
-              option_value = task.validate_option(option_name, option_value)
+              option_value = New::Task.validate_option(option_name, option_settings, option_value)
             rescue
               option_value = nil
             end
@@ -159,7 +172,7 @@ class New::Cli < Thor
           option_value = nil
           until option_value
             A.sk '', :newline => false, :preset => :prompt do |response|
-              option_value = task.validate_option(option_name, response) rescue nil
+              option_value = New::Task.validate_option(option_name, option_settings, response) rescue nil
             end
           end
         end
@@ -177,42 +190,46 @@ class New::Cli < Thor
 
     # Success Message
     S.ay "A `#{'Newfile'.green}` was successfully created for your project `#{name.to_s.green}`"
-    S.ay 'Open the file to verify the values are correct, and make any neccessary modifications.', :indent => 2
-    S.ay "You are now ready to run `#{'new release'.green}` to release your software into the wild!", :indent => 2
+    S.ay 'Open the file to verify the values are correct, and make any neccessary modifications.'
+    S.ay "You are now ready to run `#{'new release'.green}` to release your software into the wild!"
     S.ay
   end
 
   desc 'tasks', 'List all available tasks'
+  option :sources, :type => :boolean, :aliases => ['-s'], :default => false, :desc => 'Show/Hide task sources'
   def tasks args = {}
     # merge into default options
-    args.reverse_merge!({
-     :show_source => false,
+    options = {
+     :show_source => (@options['sources'] || false),
      :load_newfiles => true,
      :load_sources => true
-    })
+    }.merge(args)
 
-    New.load_newfiles if args[:load_newfiles]
-    if args[:load_sources]
-      S.ay 'Fetching sources...', :prompt
+    New.load_newfiles if options[:load_newfiles]
+    if options[:load_sources]
+      S.ay
+      S.ay 'Fetching sources...', :header
+      S.ay "Use the #{'green'.green} value for defining task sources in your Newfile", :indent => 2 if options[:show_source]
       S.ay
       New::Source.load_sources
     end
 
     New::Source.sources.each do |source_name, source|
-      S.ay source_name.to_s, :preset => :task_source, :newline => false, :indent => 1#, :padding => padding, :justify => :rjust
-      S.ay source.path, :preset => :task_path, :indent => 1
-
       # determine the widest task & add some padding
-      padding = source.tasks.keys.map(&:length).max + 4
+      longest_task_length = source.tasks.keys.map(&:length).max
+
+      S.ay source_name.to_s, :indent => 2, :newline => false, :style => :underline
+      S.ay source.path, :highlight_value
 
       source.tasks.each do |task_name, task|
-        if args[:show_source]
-          S.ay "#{source_name}#", :preset => :highlight_value, :indent => 1, :newline => false
-          S.ay task_name.to_s, :preset => :highlight_key, :padding => padding, :justify => :ljust, :newline => false
+        if options[:show_source]
+          padding = longest_task_length + source_name.to_s.length + 2
+          S.ay "#{source_name}##{task_name}", :preset => :header, :newline => false, :indent => 2, :padding => padding, :justify => :ljust
         else
-          S.ay task_name.to_s, :preset => :highlight_value, :padding => padding, :justify => :ljust, :newline => false, :indent => 3
+          padding = longest_task_length + 2
+          S.ay task_name.to_s, :preset => :header, :newline => false, :indent => 2, :padding => padding, :justify => :ljust
         end
-        S.ay task.description
+        S.ay task.description, :indent => 2
       end
 
       S.ay
@@ -227,12 +244,15 @@ class New::Cli < Thor
 
     # request the version to bump
     S.ay
-    S.ay "Releasing a new version of: #{New.new_object[:name].green}", :indent => 2
-    S.ay "What do you want to bump: [#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)", :indent => 4
+    S.ay 'Releasing a new version of: ', :highlight_key
+    S.ay New.new_object[:name], :highlight_value
+    S.ay 'What do you want to bump: ', :highlight_key
+    S.ay "[#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)", :preset => :highlight_value, :color => :white
     version = Semantic::Version.new New.new_object[:version]
     version_bump_part = nil
     until version_bump_part
-      A.sk "Current Version: #{version.to_s.green}", :indent => 13 do |response|
+      S.ay 'Current Version:', :highlight_key
+      A.sk version.to_s, :highlight_value do |response|
         version_bump_part = case response
         when 'M'
           version.major += 1
@@ -244,12 +264,13 @@ class New::Cli < Thor
         when 'p'
           version.patch += 1
         else
-          S.ay 'You must choose from [Mmp]', :fail
+          S.ay 'You must choose from [Mmp]', :error
           nil
         end
       end
     end
-    S.ay "New Version: #{version.to_s.green}", type: :success, :indent => 17
+    S.ay 'New Version: ', :highlight_key
+    S.ay version.to_s, :highlight_value
     S.ay
 
     # collect a list of changes in this version
@@ -257,15 +278,16 @@ class New::Cli < Thor
     S.ay
 
     # show tasks
-    S.ay "#{'Running Tasks:'.green} (in order)", :highlight_value
+    S.ay "#{'Running Tasks:'.green} (in order)"
     skip_tasks = @options['skip'].map(&:to_sym)
     New.new_object[:tasks].keys.each do |task|
       if skip_tasks.include?(task)
-        S.ay "#{task.to_s} (skipped)", :preset => :warn, :indent => 4
+        S.ay "#{task.to_s} (skipped)", :preset => :fine_print, :indent => 4
       else
         S.ay task.to_s, :indent => 2
       end
     end
+    S.ay
 
     New.new version.to_s, changelog, @options['skip']
   end
@@ -273,8 +295,8 @@ class New::Cli < Thor
   desc 'version', 'Show the current version'
   def version
     New.load_newfiles
-    S.ay New.new_object[:name], :newline => false
-    S.ay New.new_object[:version], :color => :green, :indent => 1
+    S.ay New.new_object[:name], :highlight_key
+    S.ay New.new_object[:version], :highlight_value
   end
 
   desc 'test', 'Run task tests from sources'
@@ -353,9 +375,9 @@ class New::Cli < Thor
 
   no_commands do
     def get_changelog_from_user
-      S.ay 'Lets add some items to the changelog'
-      S.ay 'Add multiple entries by pressing ENTER after each one', :preset => :warn, :indent => 2
-      S.ay 'Enter an empty value to finish', :preset => :warn, :indent => 2
+      S.ay 'Lets add some items to the changelog', :header
+      S.ay 'Add multiple entries by pressing ENTER after each one', :instruction
+      S.ay 'Enter an empty value to finish', :instruction
 
       user_changelog = []
       user_response = nil
@@ -368,7 +390,7 @@ class New::Cli < Thor
             next
           end
 
-          user_changelog << response
+          user_changelog << user_response = response
         end
       end
 
@@ -389,12 +411,12 @@ class New::Cli < Thor
       end
 
       if validation.is_a? Hash
-        S.ay 'We need to collect a list of complex objects'
+        S.ay 'We need to collect a list of complex objects', :header
 
         user_response = nil
         until user_response == 'n'
-          S.ay "#{user_array.length} objects created: ", :preset => :warn, :indent => 2, :newline => false
-          S.ay user_array.join(', ')
+          S.ay "#{user_array.length} objects created: ", :indent => 2, :newline => false
+          S.ay user_array.join(', '), :highlight_value
           A.sk 'Press ENTER to create another object.  Enter `n` to stop.', :prompt do |response|
             if response == 'n'
               user_response = 'n'
@@ -407,9 +429,9 @@ class New::Cli < Thor
         end
 
       else
-        S.ay "We need to collect a list of #{validation}s"
-        S.ay 'Add multiple values by pressing ENTER after each one', :preset => :warn, :indent => 2
-        S.ay 'Enter an empty value to finish', :preset => :warn, :indent => 2
+        S.ay "We need to collect a list of #{validation}s", :header
+        S.ay 'Add multiple values by pressing ENTER after each one', :instruction
+        S.ay 'Enter an empty value to finish', :instruction
 
         # add to the array until an empty string is entered
         user_response = nil
@@ -446,7 +468,7 @@ class New::Cli < Thor
 
       # get user values for required validation keys
       validation.each do |key, klass|
-        S.ay 'We need to collect some required values'
+        S.ay 'We need to collect some required values', :header
 
         user_response = nil
         until user_response
@@ -454,7 +476,7 @@ class New::Cli < Thor
           # do not allow nested arrays/hashes
           # these should be declared as their own option
           if klass == Array || klass == Hash
-            S.ay 'Hash options cannot have nested Arrays or Hashes. They should be declared as their own option.', :fail
+            S.ay 'Hash options cannot have nested Arrays or Hashes. They should be declared as their own option.', :error
             exit
           end
 
@@ -478,9 +500,9 @@ class New::Cli < Thor
 
       if allow_custom_keys
         # Allow users to enter custom keys AND values
-        S.ay 'You can add custom keys & values if you want'
-        S.ay 'Add multiple key/value pairs by pressing ENTER after each one', :preset => :warn, :indent => 2
-        S.ay 'Enter an empty key to finish', :preset => :warn, :indent => 2
+        S.ay 'You can add custom keys & values if you want', :header
+        S.ay 'Add multiple key/value pairs by pressing ENTER after each one', :instruction
+        S.ay 'Enter an empty key to finish', :instruction
 
         user_key_response = nil
         until user_key_response == ''

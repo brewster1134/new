@@ -24,6 +24,7 @@ describe New::Cli do
 
       stub_const 'New::NEWFILE_NAME', 'Newfile_spec'
       allow(A).to receive(:sk).and_yield 'foo'
+      allow(New::Task).to receive(:validate_option).and_return 'foo'
       allow(@task).to receive(:class_options).and_return({:foo => {}})
 
       @cli.options = {
@@ -39,6 +40,7 @@ describe New::Cli do
     after do
       FileUtils.rm File.join(New::PROJECT_DIRECTORY, New::NEWFILE_NAME)
       stub_const 'New::NEWFILE_NAME', 'Newfile'
+      allow(New::Task).to receive(:validate_option).and_call_original
       allow(@task).to receive(:class_options).and_call_original
     end
 
@@ -51,7 +53,7 @@ describe New::Cli do
 
   describe '#tasks' do
     before do
-      @cli.tasks
+      @cli.tasks :show_source => false
     end
 
     it 'should request to load newfiles and sources' do
@@ -63,7 +65,7 @@ describe New::Cli do
       expect(S).to have_received(:ay).with('spec', anything).ordered
       expect(S).to have_received(:ay).with(including('/spec/fixtures'), anything).ordered
       expect(S).to have_received(:ay).with('task', anything).ordered
-      expect(S).to have_received(:ay).with('Spec Task Description').ordered
+      expect(S).to have_received(:ay).with('Spec Task Description', anything).ordered
     end
   end
 

@@ -40,7 +40,7 @@ class New::Source
         @@sources.values.each do |source|
           return source.tasks[task_name.to_sym] || next
         end
-        S.ay "No `#{task_name}` task was found in any of the sources", :fail
+        S.ay "No `#{task_name}` task was found in any of the sources", :error
       end
 
       return nil
@@ -59,10 +59,10 @@ class New::Source
         if task = source.tasks[task_name.to_sym]
           return task
         else
-          S.ay "No `#{task_name}` task was found in the `#{source_name}` source", :fail
+          S.ay "No `#{task_name}` task was found in the `#{source_name}` source", :error
         end
       else
-        S.ay "No `#{source_name}` source was found", :fail
+        S.ay "No `#{source_name}` source was found", :error
       end
 
       return nil

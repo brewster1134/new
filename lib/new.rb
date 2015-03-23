@@ -84,16 +84,12 @@ private
     new_options.delete(:sources)
     new_options.delete(:tasks)
 
-    # collect & verify tasks
-    if @@cli
-      S.ay
-      S.ay 'Verifying all tasks...', :task_path
-    end
-
     new_tasks = []
     @@new_object[:tasks].each do |task_name, task_options|
       # skip tasks
       next if skip_tasks.include? task_name.to_s
+
+      S.ay "Preparing `#{task_name}`", :header
 
       # dupe task options
       new_task_options = task_options ? task_options.dup : {}
@@ -109,30 +105,22 @@ private
       task.options = new_options.dup
 
       # validate task before running anything
+      S.ay 'Validating Options: ', :highlight_key
       task.validate
+      S.ay 'OK', :highlight_value
 
-      # verify task
+      # verify tasks
+      S.ay 'Verifying Task Dependencies: ', :highlight_key
       task.verify
-
-      if @@cli
-        S.ay task_name.to_s, :newline => false, :preset => :highlight_key
-        S.ay ': Verified', :highlight_value
-      end
-    end
-
-    # run all tasks
-    if @@cli
+      S.ay 'OK', :highlight_value
       S.ay
-      S.ay 'Running all tasks...', :task_path
     end
 
     new_tasks.each do |task|
+      S.ay "Running   `#{task.name}`", :highlight_key
       task.run
-
-      if @@cli
-        S.ay task.name.to_s, :newline => false, :preset => :highlight_key
-        S.ay ': Success', :highlight_value
-      end
+      S.ay 'OK', :highlight_value
+      S.ay
     end
 
     # write new Newfile with new version
@@ -141,5 +129,13 @@ private
     File.open File.join(PROJECT_DIRECTORY, NEWFILE_NAME), 'w+' do |f|
       f.write new_newfile.to_yaml
     end
+
+    # release summary
+    S.ay
+    S.ay 'Version ', :newline => false
+    S.ay "#{@@new_object[:version]}", :preset => :header, :newline => false
+    S.ay ' of ', :newline => false
+    S.ay "#{@@new_object[:name]}", :preset => :header, :newline => false
+    S.ay ' successfully released!'
   end
 end
