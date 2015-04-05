@@ -53,6 +53,17 @@ describe New do
     end
   end
 
+  describe '.set_verbose' do
+    before do
+      New.class_var :verbose, false
+      New.set_verbose
+    end
+
+    it 'should toggle verbose to true' do
+      expect(New.class_var(:verbose)).to eq true
+    end
+  end
+
   describe '#initialize' do
     context 'with all tasks' do
       before do

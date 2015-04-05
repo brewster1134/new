@@ -25,6 +25,3 @@ tasks:
       -
         repo: origin
         branch: master
-      -
-        repo: heroku
-        branch: master

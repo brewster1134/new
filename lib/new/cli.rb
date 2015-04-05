@@ -237,8 +237,10 @@ class New::Cli < Thor
   end
 
   desc 'release', 'Release a new version of your project'
+  option :verbose, :type => :boolean, :aliases => ['-v'], :default => false, :desc => 'Verbose mode'
   option :skip, :type => :array, :aliases => ['-s'], :default => [], :desc => 'Tasks to skip for this release'
   def release
+    New.set_verbose if @options['verbose']
     New.set_cli
     New.load_newfiles
 

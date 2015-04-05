@@ -22,6 +22,7 @@ class New
   #
   class << self
     @@cli = false
+    @@verbose = false
     @@new_object = {
       :sources => {
         :default => 'brewster1134/new-tasks'
@@ -33,6 +34,10 @@ class New
 
     # set cli to true when initialized via cli
     def set_cli; @@cli = true; end
+
+    # set verbose to true when set via cli
+    def set_verbose; @@verbose = true; end
+    def verbose; @@verbose; end
 
     # Load Newfile in home & project directory
     #

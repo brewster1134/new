@@ -1,6 +1,5 @@
 class New::Task
   extend New::Validation
-  SILENCE = '>> /dev/null 2>&1'
 
   #
   # CLASS METHODS
@@ -48,9 +47,9 @@ class New::Task
   end
 
   # task to check that outside dependencies are met before we run the tasks
+  # since verify is not a required method, we define a blank one to prevent undefined method errors
   #
-  def verify
-  end
+  def verify; end
 
   # validate all options
   #
@@ -63,6 +62,15 @@ class New::Task
       # set the new validated value
       @options[:task_options][option_name] = new_option_value
     end
+  end
+
+  # run a system command
+  def run_command command
+    # if verbose, dont redirect output to null
+    command += ' >> /dev/null 2>&1' unless New.verbose
+
+    # run the command
+    Kernel.system command
   end
 
 private
