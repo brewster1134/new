@@ -122,10 +122,8 @@ private
     end
 
     new_tasks.each do |task|
-      S.ay "Running   `#{task.name}`", :highlight_key
+      S.ay "Running `#{task.name}`", :header
       task.run
-      S.ay 'OK', :highlight_value
-      S.ay
     end
 
     # write new Newfile with new version
