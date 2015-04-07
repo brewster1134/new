@@ -2,9 +2,9 @@
 sources:
   default: ~/Code/ruby/new-tasks
 name: New
-version: 1.0.5
+version: 1.0.6
 tasks:
-  changelog:
+  changelog: 
   gem:
     name: new
     summary: A tool to release your software into the wild.
@@ -22,6 +22,5 @@ tasks:
       - new
   git:
     remotes:
-      -
-        repo: origin
-        branch: master
+    - repo: origin
+      branch: master
