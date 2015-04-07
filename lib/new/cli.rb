@@ -297,7 +297,7 @@ class New::Cli < Thor
   desc 'version', 'Show the current version'
   def version
     New.load_newfiles
-    S.ay New.new_object[:name], :highlight_key
+    S.ay New.new_object[:name], :preset => :highlight_key, :padding => 0, :indent => 0
     S.ay New.new_object[:version], :highlight_value
   end
 
