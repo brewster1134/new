@@ -1,3 +1,6 @@
+###### 1.0.7
+* improved cli output
+
 ###### 1.0.6
 * verbose mode
 * improved init for arrays & hashes
