@@ -34,8 +34,11 @@ To use new, you need to have a Newfile in the root of the project. The Newfile i
 
 * Run `new init` from your project directory to create your Newfile _*see Quick Usage above_
 * Run `new tasks` to view all available tasks
-* `name`: The name of your project _*required_
-* `version`: The current verison of your software _*required_
+
+###### Required options
+* `name`: The name of your project
+* `version`: The current verison of your software
+* `tasks`: A list of tasks (and their options) to run in order
 
 ```yaml
 name: My Project Name
@@ -51,9 +54,9 @@ tasks:
 
 ---
 #### Release New Version
-To release a new version of your software, simply run `new` from your project's root. You will be prompted to choose what new semantic version you want to release. Make sure to follow [semantic versioning rules](http://semver.org/)!
+To release a new version of your software, simply run `new release` from your project's root. You will be prompted to choose what new semantic version you want to release. Make sure to follow [semantic versioning rules](http://semver.org/)!
 ```shell
-new
+new release
 ```
 
 ---
