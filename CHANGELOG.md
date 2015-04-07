@@ -1,3 +1,6 @@
+###### 1.0.9
+* fixed included gem files
+
 ###### 1.0.8
 * push Newfile to repo after release
 
