@@ -4,13 +4,13 @@ sources:
 name: New
 version: 1.0.8
 tasks:
-  changelog: 
+  changelog:
   gem:
     name: new
     summary: A tool to release your software into the wild.
     files:
-    - bin/*
-    - lib/*
+    - bin/**/*
+    - lib/**/*
     authors:
     - Ryan Brewster
     licenses:
