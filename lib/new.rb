@@ -121,16 +121,16 @@ private
       S.ay
     end
 
-    new_tasks.each do |task|
-      S.ay "Running `#{task.name}`", :header
-      task.run
-    end
-
     # write new Newfile with new version
     new_newfile = YAML.load(File.read(File.join(PROJECT_DIRECTORY, NEWFILE_NAME)))
     new_newfile['version'] = version
     File.open File.join(PROJECT_DIRECTORY, NEWFILE_NAME), 'w+' do |f|
       f.write new_newfile.to_yaml
+    end
+
+    new_tasks.each do |task|
+      S.ay "Running `#{task.name}`", :header
+      task.run
     end
 
     # release summary
