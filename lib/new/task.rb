@@ -1,3 +1,6 @@
+#
+# New::Task is the base class that all custom tasks need to inherit from
+#
 class New::Task
   extend New::Validation
 
@@ -65,6 +68,9 @@ class New::Task
   end
 
   # run a system command
+  # @param command [String] the system command to run
+  # @return [Boolean] true/false based on if the exit status of the command
+  #
   def run_command command
     # if verbose, dont redirect output to null
     command += ' >> /dev/null 2>&1' unless New.verbose

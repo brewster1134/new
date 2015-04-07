@@ -1,3 +1,6 @@
+#
+# New::Cli is a class built on Thor for interfacing with the user on the command line
+#
 require 'active_support/core_ext/hash/reverse_merge'
 require 'active_support/core_ext/hash/keys'
 require 'cli_miami'
@@ -405,11 +408,7 @@ class New::Cli < Thor
 
       # convert array to hash of Strings
       if validation.is_a? Array
-        validation_hash = {}
-        validation.each do |v|
-          validation_hash[v.to_sym] = String
-        end
-        validation = validation_hash
+        validation = array_to_hash validation
       end
 
       if validation.is_a? Hash
@@ -461,11 +460,7 @@ class New::Cli < Thor
 
       # convert array to hash of Strings
       if validation.is_a? Array
-        validation_hash = {}
-        validation.each do |v|
-          validation_hash[v.to_sym] = String
-        end
-        validation = validation_hash
+        validation = array_to_hash validation
       end
 
       # get user values for required validation keys
@@ -534,6 +529,20 @@ class New::Cli < Thor
       end
 
       return user_hash
+    end
+
+    # convert an array to a hash
+    # uses the array elements as hash keys, and sets the value to String
+    # @param array [Array] any array
+    # @return [Hash]
+    #
+    def array_to_hash array
+      array_hash = {}
+      array.each do |v|
+        array_hash[v.to_sym] = String
+      end
+
+      return array_hash
     end
   end
 

@@ -1,5 +1,7 @@
+#
+# New::Source represents a source (local or remote) that contains new tasks
+#
 require 'sourcerer'
-
 class New::Source
   #
   # CLASS METHODS

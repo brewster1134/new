@@ -306,4 +306,10 @@ describe New::Cli do
       end
     end
   end
+
+  describe '#array_to_hash' do
+    it 'should convert an array to a hash of strings' do
+      expect(@cli.array_to_hash(['foo', 'bar'])).to eq({ :foo => String, :bar => String })
+    end
+  end
 end

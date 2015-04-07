@@ -1,3 +1,7 @@
+#
+# New is the core class that acts as the controller for new
+# It is reponsible for storing the state and globally accessible data
+#
 require 'active_support/core_ext/hash/deep_merge'
 require 'yaml'
 

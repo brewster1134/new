@@ -1,3 +1,6 @@
+#
+# New::Validation is a module for all validation methods
+#
 module New::Validation
   # validate a task option using a task and its associated options
   #
