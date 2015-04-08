@@ -199,6 +199,7 @@ class New::Cli < Thor
   end
 
   desc 'tasks', 'List all available tasks'
+  option :task, :aliases => ['-t'], :desc => 'Get details for a single task'
   option :sources, :type => :boolean, :aliases => ['-s'], :default => false, :desc => 'Show/Hide task sources'
   def tasks args = {}
     # merge into default options
@@ -210,32 +211,62 @@ class New::Cli < Thor
 
     New.load_newfiles if options[:load_newfiles]
     if options[:load_sources]
-      S.ay
       S.ay 'Fetching sources...', :header
       S.ay "Use the #{'green'.green} value for defining task sources in your Newfile", :indent => 2 if options[:show_source]
       S.ay
       New::Source.load_sources
     end
 
-    New::Source.sources.each do |source_name, source|
-      # determine the widest task & add some padding
-      longest_task_length = source.tasks.keys.map(&:length).max
-
-      S.ay source_name.to_s, :indent => 2, :newline => false, :style => :underline
-      S.ay source.path, :highlight_value
-
-      source.tasks.each do |task_name, task|
-        if options[:show_source]
-          padding = longest_task_length + source_name.to_s.length + 2
-          S.ay "#{source_name}##{task_name}", :preset => :header, :newline => false, :indent => 2, :padding => padding, :justify => :ljust
-        else
-          padding = longest_task_length + 2
-          S.ay task_name.to_s, :preset => :header, :newline => false, :indent => 2, :padding => padding, :justify => :ljust
-        end
-        S.ay task.description, :indent => 2
-      end
-
+    if @options['task']
+      task = New::Source.find_task @options['task']
+      S.ay task.name.to_s.upcase, :preset => :header, :style => :underline, :padding => 30, :justify => :center
+      S.ay "source: #{task.source.name.to_s}", :color => :cyan, :padding => 30, :justify => :center
       S.ay
+
+      max_option_length = task.class_options.keys.map(&:length).max
+      task.class_options.each do |name, settings|
+        S.ay name.to_s, :preset => :highlight_key, :padding => max_option_length, :style => :underline
+        S.ay settings[:description], :highlight_value
+
+        S.ay 'Type:', :preset => :highlight_key, :padding => max_option_length + 13
+        S.ay "#{settings[:type] || 'String'}", :highlight_value
+
+        if settings[:required]
+          S.ay 'Required:', :preset => :highlight_key, :padding => max_option_length + 13
+          S.ay 'true', :highlight_value
+        elsif settings[:default]
+          S.ay 'Default:', :preset => :highlight_key, :padding => max_option_length + 13
+          S.ay settings[:default].to_s, :highlight_value
+        end
+
+        if settings[:validation]
+          S.ay 'Validation:', :preset => :highlight_key, :padding => max_option_length + 13
+          S.ay settings[:validation].to_s, :highlight_value
+        end
+
+        S.ay
+      end
+    else
+      New::Source.sources.each do |source_name, source|
+        # determine the widest task & add some padding
+        longest_task_length = source.tasks.keys.map(&:length).max
+
+        S.ay source_name.to_s, :indent => 2, :newline => false, :style => :underline
+        S.ay source.path, :highlight_value
+
+        source.tasks.each do |task_name, task|
+          if options[:show_source]
+            padding = longest_task_length + source_name.to_s.length + 2
+            S.ay "#{source_name}##{task_name}", :preset => :header, :newline => false, :indent => 2, :padding => padding, :justify => :ljust
+          else
+            padding = longest_task_length + 2
+            S.ay task_name.to_s, :preset => :header, :newline => false, :indent => 2, :padding => padding, :justify => :ljust
+          end
+          S.ay task.description, :indent => 2
+        end
+
+        S.ay
+      end
     end
   end
 
