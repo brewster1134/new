@@ -1,3 +1,7 @@
+###### 1.0.10
+* new release accepts --bump option
+* new tasks accepts --task option
+
 ###### 1.0.9
 * fixed included gem files
 
