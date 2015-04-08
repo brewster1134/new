@@ -74,8 +74,6 @@ describe New::Cli do
       allow(@cli).to receive(:get_changelog_from_user).and_return(['changelog'])
       allow(New).to receive(:new)
 
-      @cli.options = { 'skip' => [] }
-
       New.new_object = {
         :version => '1.2.3'
       }
@@ -87,8 +85,7 @@ describe New::Cli do
 
     context 'when bumping any version' do
       before do
-        allow(A).to receive(:sk).and_yield 'p'
-
+        @cli.options = { 'skip' => [], 'bump' => 'p' }
         @cli.release
       end
 
@@ -104,40 +101,32 @@ describe New::Cli do
         expect(New).to have_received(:new).with '1.2.4', ['changelog'], []
       end
     end
+  end
+
+  describe '#bump_version' do
+    before do
+      @version = Semantic::Version.new '1.2.3'
+    end
+
+    it 'should return nil for invalid part' do
+      expect(@cli.bump_version(@version, 'F')).to eq nil
+    end
 
     context 'when bumping a patch version' do
-      before do
-        allow(A).to receive(:sk).and_yield 'p'
-
-        @cli.release
-      end
-
       it 'should increment the patch version' do
-        expect(New).to have_received(:new).with '1.2.4', ['changelog'], []
+        expect(@cli.bump_version(@version, 'p').to_s).to eq '1.2.4'
       end
     end
 
     context 'when bumping a minor version' do
-      before do
-        allow(A).to receive(:sk).and_yield 'm'
-
-        @cli.release
-      end
-
       it 'should increment the minor version and set the patch version to 0' do
-        expect(New).to have_received(:new).with '1.3.0', ['changelog'], []
+        expect(@cli.bump_version(@version, 'm').to_s).to eq '1.3.0'
       end
     end
 
     context 'when bumping a major version' do
-      before do
-        allow(A).to receive(:sk).and_yield 'M'
-
-        @cli.release
-      end
-
       it 'should increment the major version and set the minor & patch versions to 0' do
-        expect(New).to have_received(:new).with '2.0.0', ['changelog'], []
+        expect(@cli.bump_version(@version, 'M').to_s).to eq '2.0.0'
       end
     end
   end

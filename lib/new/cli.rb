@@ -240,41 +240,36 @@ class New::Cli < Thor
   end
 
   desc 'release', 'Release a new version of your project'
+  option :bump, :aliases => ['-b'], :enum => ['M', 'm', 'p'], :desc => 'Version part to bump'
   option :verbose, :type => :boolean, :aliases => ['-v'], :default => false, :desc => 'Verbose mode'
   option :skip, :type => :array, :aliases => ['-s'], :default => [], :desc => 'Tasks to skip for this release'
   def release
-    New.set_verbose if @options['verbose']
     New.set_cli
+    New.set_verbose if @options['verbose']
     New.load_newfiles
 
-    # request the version to bump
     S.ay
-    S.ay 'Releasing a new version of: ', :highlight_key
-    S.ay New.new_object[:name], :highlight_value
-    S.ay 'What do you want to bump: ', :highlight_key
-    S.ay "[#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)", :preset => :highlight_value, :color => :white
+    S.ay 'Releasing a new version of:', :highlight_key
+    S.ay New.new_object[:name].to_s, :highlight_value
+
     version = Semantic::Version.new New.new_object[:version]
-    version_bump_part = nil
-    until version_bump_part
-      S.ay 'Current Version:', :highlight_key
-      A.sk version.to_s, :highlight_value do |response|
-        version_bump_part = case response
-        when 'M'
-          version.major += 1
-          version.minor = 0
-          version.patch = 0
-        when 'm'
-          version.minor += 1
-          version.patch = 0
-        when 'p'
-          version.patch += 1
-        else
-          S.ay 'You must choose from [Mmp]', :error
-          nil
+    S.ay 'Current Version:', :highlight_key
+    S.ay version.to_s, :highlight_value
+
+    if @options['bump']
+      version = bump_version version, @options['bump']
+    else
+      S.ay 'What do you want to bump:', :highlight_key
+      S.ay "[#{'Mmp'.green}] (#{'M'.green}ajor / #{'m'.green}inor / #{'p'.green}atch)", :preset => :highlight_value, :color => :white
+      version_bump_part = nil
+      until version_bump_part
+        A.sk '', :prompt do |response|
+          version = version_bump_part = bump_version version, response
         end
       end
     end
-    S.ay 'New Version: ', :highlight_key
+
+    S.ay 'New Version:', :highlight_key
     S.ay version.to_s, :highlight_value
     S.ay
 
@@ -416,7 +411,7 @@ class New::Cli < Thor
 
         user_response = nil
         until user_response == 'n'
-          S.ay "#{user_array.length} objects created: ", :indent => 2, :newline => false
+          S.ay "#{user_array.length} objects created:", :indent => 2, :newline => false
           S.ay user_array.join(', '), :highlight_value
           A.sk 'Press ENTER to create another object.  Enter `n` to stop.', :prompt do |response|
             if response == 'n'
@@ -543,6 +538,30 @@ class New::Cli < Thor
       end
 
       return array_hash
+    end
+
+    # bump a semantic version
+    # @param version [Semantic::Version] a Semantic::Version object
+    # @param part [String] a supported part character [Mmp]
+    # @return [Semantic::Version] a new Semantic::Version object
+    #
+    def bump_version version, part
+      case part
+      when 'M'
+        version.major += 1
+        version.minor = 0
+        version.patch = 0
+      when 'm'
+        version.minor += 1
+        version.patch = 0
+      when 'p'
+        version.patch += 1
+      else
+        S.ay 'You must choose from [Mmp]', :error
+        return nil
+      end
+
+      return version
     end
   end
 
